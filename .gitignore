@@ -1,0 +1,16 @@
+# Ignore everything by default
+*
+
+# Except these files and directories
+!CLAUDE.md
+!commands/
+!commands/**
+!agents/
+!agents/**
+!.gitignore
+
+# Agent descriptions
+!*.md
+
+# But ignore backups
+commands/backups/
