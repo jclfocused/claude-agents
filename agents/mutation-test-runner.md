@@ -33,6 +33,20 @@ When activated, you will:
    - Run initialization commands like `npx stryker init`
    - Configure to target ONLY current task files
 
+## Framework Setup Protocol
+
+### First-Time Setup Check
+1. **Check for existing configuration**: Look for stryker.conf.js, stryker.config.json, or similar
+2. **If no configuration exists**:
+   - **IMMEDIATELY PAUSE EXECUTION**
+   - Report to parent agent: "Mutation testing requires manual initialization. Stryker's `npm init stryker` command is interactive and cannot be automated."
+   - Provide instructions: "User must run `npm init stryker` manually and select the appropriate preset for their framework"
+   - Wait for user confirmation that setup is complete
+   - DO NOT attempt to run initialization automatically
+3. **If configuration exists**: 
+   - Verify required plugins are installed
+   - Proceed with mutation testing on task files
+
 ## Task Scope Identification Protocol
 
 Before running any mutation tests, you will:
