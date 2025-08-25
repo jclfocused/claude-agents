@@ -50,7 +50,9 @@ Tasks use this checkbox format:
 When executing tasks, the following specialized agents are available:
 - **start-git-task**: Creates task branch and GitHub sub-issues (user will create)
 - **tdd-red-phase**: For writing failing tests first (can use --no-verify)
+  - **PARALLEL EXECUTION**: Launch multiple instances for different test files
 - **tdd-green-phase**: For implementing production-ready code
+  - **PARALLEL EXECUTION**: Launch multiple instances for different modules
 - **mutation-test-runner**: For verifying test quality on new/modified files
 - **tdd-refactor-specialist**: For improving code while keeping tests green
 - **qa-gatekeeper**: For final quality verification
@@ -58,6 +60,12 @@ When executing tasks, the following specialized agents are available:
 - **research-investigator**: For researching patterns and best practices
 - **playwright-browser-executor**: For browser automation tasks
 - **debug-log-cleaner**: For removing debug logs
+
+### Parallel Agent Execution Strategy
+- **Identify test scope**: Determine which test files/modules are needed
+- **Launch agents simultaneously**: Use Task tool with multiple agent calls
+- **Wait for completion**: All parallel agents must complete before proceeding
+- **Aggregate results**: Combine outputs from all parallel agents
 
 ### Working Directory
 **CRITICAL**: Always execute from the worktree directory, NOT the main repository.
@@ -73,6 +81,66 @@ When executing tasks, the following specialized agents are available:
 2. Identify where .kiro is located relative to the git repository
 3. Determine the correct working directory before proceeding
 4. Stop and ask for clarification if ambiguous
+
+## Parallel Execution Implementation
+
+### How Parallel TDD Works
+
+When a task involves multiple test files or modules, the command will:
+
+1. **Analyze the task** to identify all test files needed
+2. **Launch agents simultaneously** using the Task tool
+3. **Monitor progress** of all parallel agents
+4. **Aggregate results** once all complete
+
+#### Example Parallel Execution Call
+
+```javascript
+// RED Phase - Launch 3 agents in parallel for different test files
+await Promise.all([
+  Task({ 
+    subagent_type: "tdd-red-phase",
+    prompt: "Write failing tests for UserController in src/controllers/UserController.test.ts",
+    description: "TDD Red: UserController"
+  }),
+  Task({
+    subagent_type: "tdd-red-phase", 
+    prompt: "Write failing tests for AuthService in src/services/AuthService.test.ts",
+    description: "TDD Red: AuthService"
+  }),
+  Task({
+    subagent_type: "tdd-red-phase",
+    prompt: "Write failing tests for ValidationHelper in src/helpers/ValidationHelper.test.ts", 
+    description: "TDD Red: ValidationHelper"
+  })
+]);
+
+// GREEN Phase - Launch 3 agents in parallel for implementations
+await Promise.all([
+  Task({
+    subagent_type: "tdd-green-phase",
+    prompt: "Implement UserController to make tests pass",
+    description: "TDD Green: UserController"
+  }),
+  Task({
+    subagent_type: "tdd-green-phase",
+    prompt: "Implement AuthService to make tests pass",
+    description: "TDD Green: AuthService"
+  }),
+  Task({
+    subagent_type: "tdd-green-phase",
+    prompt: "Implement ValidationHelper to make tests pass",
+    description: "TDD Green: ValidationHelper"
+  })
+]);
+```
+
+### Benefits of Parallel Execution
+
+- **Speed**: 3-5x faster for multi-file tasks
+- **Efficiency**: Better CPU utilization
+- **Independence**: Each agent works on separate files
+- **Consistency**: All tests written with same requirements context
 
 ## Process
 
@@ -128,10 +196,17 @@ For the selected task:
 - Updates task status to `[-]` if pending
 - Displays task number and description
 - **Shows working directory** (worktree directory)
-- **Identifies which agent to use** for each TDD phase
+- **Executes TDD phases with parallel agents**:
+  - **RED Phase**: Launch multiple `tdd-red-phase` agents in parallel
+    - One agent per test file or module
+    - All agents run simultaneously for speed
+  - **GREEN Phase**: Launch multiple `tdd-green-phase` agents in parallel
+    - One agent per failing test file
+    - Parallel implementation for all modules
+  - **REFACTOR Phase**: Single `tdd-refactor-specialist` agent
+  - **MUTATION Testing**: Single `mutation-test-runner` agent on changed files
 - Shows all implementation steps
 - Highlights requirements being fulfilled
-- Executes each step with verification using appropriate agents
 - **Updates documentation** after each major phase
 - Handles errors and rollback if needed
 
@@ -162,17 +237,21 @@ After successful execution:
 # Creates: git worktree add ../user-authentication -b feature/user-authentication
 # Switches to feature/user-authentication branch
 # Then creates and checks out: task/user-auth-1-setup
+# RED Phase: Launches 3 tdd-red-phase agents in parallel (for 3 test files)
+# GREEN Phase: Launches 3 tdd-green-phase agents in parallel (for 3 modules)
 
 # Task 2 - uses existing worktree
 /startSpecTask user-authentication
 # Already in worktree
 # Switches to feature/user-authentication branch first
 # Creates new branch from feature: task/user-auth-2-login
+# Parallel agents for faster execution
 
 # Task 3 - always branches from feature, not task-2
 /startSpecTask user-authentication  
 # Switches to feature/user-authentication (has task 1 & 2 merged)
 # Creates: task/user-auth-3-validation (from feature, not task-2)
+# Runs parallel TDD agents for all test/implementation files
 
 # Reset in-progress tasks and start fresh
 /startSpecTask user-authentication --reset
@@ -254,9 +333,15 @@ Note: Working directory is automatically determined by:
 - NOT using the .kiro parent directory
 
 Agent Assignments for this task:
-- TDD Red Phase: Use `tdd-red-phase` agent
-- TDD Green Phase: Use `tdd-green-phase` agent  
-- Mutation Testing: Use `mutation-test-runner` agent
+- TDD Red Phase: Use `tdd-red-phase` agents IN PARALLEL
+  - Launch one agent per test file/module
+  - Example: UserController.test.ts, AuthService.test.ts, ValidationHelper.test.ts
+  - All run simultaneously for faster test creation
+- TDD Green Phase: Use `tdd-green-phase` agents IN PARALLEL
+  - Launch one agent per implementation module
+  - Example: UserController.ts, AuthService.ts, ValidationHelper.ts
+  - Parallel implementation of all failing tests
+- Mutation Testing: Use `mutation-test-runner` agent on changed files
 - Refactor: Use `tdd-refactor-specialist` agent
 - Documentation: Update README.md, CLAUDE.md, steering docs
 - Quality Check: Use `qa-gatekeeper` agent
@@ -274,8 +359,33 @@ Press Enter to continue or Ctrl+C to abort...
 
 ## Execution Features
 
+### Parallel TDD Execution
+- **Automatic parallelization**: Detects multiple test files and runs agents concurrently
+- **RED Phase parallelization**:
+  ```
+  Launching parallel TDD Red Phase agents:
+  - Agent 1: Creating tests for UserController
+  - Agent 2: Creating tests for AuthService  
+  - Agent 3: Creating tests for ValidationHelper
+  [All agents run simultaneously]
+  ```
+- **GREEN Phase parallelization**:
+  ```
+  Launching parallel TDD Green Phase agents:
+  - Agent 1: Implementing UserController
+  - Agent 2: Implementing AuthService
+  - Agent 3: Implementing ValidationHelper
+  [All agents run simultaneously]
+  ```
+- **Time savings**: 3x-5x faster for multi-file tasks
+- **Result aggregation**: Combines outputs and verifies all tests
+
 ### Step-by-Step Execution with Agents
-- Uses specified agent for each TDD phase
+- Uses specified agents for each TDD phase
+- **Parallel execution for RED and GREEN phases**:
+  - Launches multiple agents simultaneously
+  - Significantly reduces overall execution time
+  - Aggregates results from all parallel agents
 - Executes from correct working directory (worktree directory)
 - Shows command output from each agent
 - Validates success before continuing
@@ -389,9 +499,11 @@ Next task: #5 - Implement authentication API endpoints
 - Requires tasks.md file in spec directory
 - **ALWAYS reviews documentation before starting**
 - **ALWAYS updates documentation after completing**
+- **Parallel agent execution for TDD phases**
 - Preserves task history and status
 - Supports interrupted workflow resumption
 - Integrates with git for version control
 - Maintains audit trail of changes
 - Can be run multiple times safely
 - Documentation is critical for project continuity
+- Performance optimized through parallel execution
