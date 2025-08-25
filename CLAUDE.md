@@ -4,7 +4,7 @@
 
 ### Version Requirements
 
-- Always use Node.js 22
+- Always use Node.js 22 by default (Check project for overrides)
 - Check current Node version with `node --version` before starting work
 
 ### Package Management
@@ -21,6 +21,7 @@
 
 - **Notion is for GENERAL knowledge**: Only use for language best practices, patterns, frameworks - NOT project-specific content
 - **Search at project start**: Use `mcp__ai-knowledge-hub__list-database-pages` to find relevant general documentation
+- **Default search is TAG search**: Pass individual tags as array, not sentences (e.g., ["vue", "testing", "best-practices"] NOT "vue testing best practices")
 - **Document REUSABLE patterns**: Only create/update Notion for knowledge applicable across multiple projects
 - **Examples of Notion content**: "Vue Best Practices", "Clean Architecture Patterns", "TDD Guidelines"
 - **DO NOT use legacy commands**: Ignore `mcp__ai-knowledge-hub__legacy-*` commands for now
@@ -39,6 +40,41 @@
    - `/src/stores/CLAUDE.md` → Store patterns for this project
    - `/src/components/CLAUDE.md` → Component patterns for this project
    - Notion → "Vue Component Best Practices" (general, reusable)
+
+## Background Task Management
+
+### IMPORTANT: Always Use Your Own Background Sessions
+
+**CRITICAL**: Always check and manage background processes in your own shell sessions.
+
+1. **Check Existing Background Tasks First**
+   - Always check if processes are already running in your background sessions
+   - Use `BashOutput` to check status of any background processes (bash_1, bash_2, etc.)
+   - If a process should be running but isn't in your sessions, kill external instances and restart in your shell
+
+2. **Start All Long-Running Processes in Background**
+   - Development servers: `npm run start:dev` with `run_in_background: true`
+   - Database containers: `docker-compose up -d` 
+   - Build watchers: `npm run watch` with `run_in_background: true`
+   - Any process that needs to stay running throughout the session
+
+3. **Monitor Background Processes**
+   - Regularly check background process output with `BashOutput`
+   - Watch for errors, crashes, or important logs
+   - Keep track of all background process IDs (bash_1, bash_2, etc.)
+
+4. **Process Ownership Rule**
+   - ALWAYS assume processes should run through your shell going forward
+   - If user mentions a service should be running, ensure it's in YOUR background sessions
+   - Kill and restart any externally started processes to maintain control
+   - This ensures you can monitor logs, catch errors, and manage lifecycle
+
+5. **Common Background Tasks**
+   - API servers (port 3000, 3001, etc.)
+   - Frontend dev servers (port 5173, 3000, etc.)
+   - Database containers (PostgreSQL, Redis, MongoDB)
+   - Test watchers and build processes
+   - Queue workers and schedulers
 
 ## Development Workflow
 
@@ -140,3 +176,36 @@ Every development plan MUST explicitly include:
 - Test as you develop
 - Document learnings for future reference
 - Keep dependencies up to date
+
+## Available Agents
+
+### TDD Agents
+- **tdd-red-phase** - Writes comprehensive failing tests before implementation (RED phase of TDD)
+- **tdd-green-phase** - Implements production code to make failing tests pass (GREEN phase of TDD)  
+- **tdd-refactor-specialist** - Improves code quality while maintaining passing tests (REFACTOR phase of TDD)
+- **mutation-test-runner** - Evaluates test suite quality through mutation testing on changed files
+
+### Code Quality Agents
+- **lint-fixer** - Fixes all linting issues (ESLint, TypeScript, etc.) without disabling rules or using shortcuts
+- **debug-log-cleaner** - Removes debug logging while preserving error logs and production-relevant logging
+- **qa-gatekeeper** - Performs final quality assurance checks before marking work complete
+
+### Development Support Agents
+- **research-investigator** - Researches technical topics, investigates codebases, and finds best practices
+- **playwright-browser-executor** - Handles browser automation, web scraping, and UI testing with Playwright
+
+## Available Commands
+
+### Specification Workflow Commands
+- **/createSteering** - Generate project steering documents (product, structure, tech guidelines)
+- **/createSpecReq** - Create requirements document for a feature specification
+- **/createSpecDesign** - Generate design document from requirements
+- **/createSpecTask** - Create implementation task list with TDD and quality gates
+- **/startSpecTask** - Execute the next pending task from a specification
+- **/describeSpec** - Display comprehensive guide for specification workflow
+- **/reviewProject** - Gather project context and execute custom prompts
+
+### Development Commands
+- **/commit** - Create git commit with intelligent pre-commit hook resolution (never uses --no-verify)
+- **/runApp** - Build and run mobile app on simulator/emulator with auto-detection
+- NEVER ADD TIME ESTIMATES TO ANY PLAN EVER - IMPORTANT

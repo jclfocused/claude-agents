@@ -181,7 +181,7 @@ All task types follow the same TDD workflow:
 ## Progress Tracking
 
 - `[ ]` Pending - Not started
-- `[~]` In-progress - Currently working (only one at a time)
+- `[-]` In-progress - Currently working (only one at a time)
 - `[x]` Complete - All phases done, quality gates passed, docs updated
 
 ## Agent Integration

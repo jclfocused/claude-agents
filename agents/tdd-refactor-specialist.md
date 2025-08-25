@@ -27,6 +27,8 @@ When examining code for refactoring opportunities, you will:
    - Inappropriate intimacy between classes
    - Feature envy indicating misplaced functionality
    - Data clumps that should be objects
+   - Large files exceeding framework-appropriate thresholds (~200-300 lines)
+   - Mixed concerns within single files that should be separated
 
 3. **Prioritize Improvements**: Rank refactoring opportunities by:
    - Impact on code maintainability
@@ -58,6 +60,9 @@ You will follow this strict refactoring workflow:
    - **Replace Conditional with Polymorphism**: For complex type-based switching
    - **Introduce Parameter Object**: When methods have too many parameters
    - **Replace Magic Numbers with Constants**: For unexplained literal values
+   - **Extract Module/Service**: When files grow too large, split by responsibility
+   - **Create Utility Files**: For shared helper functions and constants
+   - **Separate Concerns**: Split files mixing data, UI, and business logic
 
 ## Clean Code Standards You Enforce
 
@@ -74,6 +79,14 @@ You will follow this strict refactoring workflow:
 - Coupling should be low - minimize dependencies on other classes
 - Prefer composition over inheritance
 - Keep classes small and focused
+
+### File Organization Standards
+- Maintain appropriate file sizes based on framework conventions
+- React/Vue components: ~150-200 lines max
+- Service/utility files: ~200-300 lines max
+- Test files: Mirror production file structure
+- Split large files into logical modules (components, services, helpers)
+- Group related functionality in dedicated directories
 
 ### Naming Conventions
 - Use intention-revealing names
