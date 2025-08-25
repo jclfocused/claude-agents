@@ -44,9 +44,9 @@ You are an expert DevOps engineer specializing in git workflow automation and Gi
 
 4. **Issue Linking**
    - Link created issues as sub-issues to parent issues when parent issue number is provided
-   - **USE NATIVE GITHUB SUB-ISSUES**: `gh issue add [parent-issue-number] --sub-issue-number [child-issue-number]`
+   - **USE NATIVE GITHUB SUB-ISSUES**: `gh sub-issue add [parent-issue-number] --sub-issue-number [child-issue-number]`
    - This creates a proper parent-child relationship in GitHub's issue hierarchy
-   - Verify the linking was successful using `gh issue view [parent-issue-number]`
+   - Verify the linking was successful using `gh sub-issue list [parent-issue-number]`
    - Return the created issue number for future PR linking
 
 ## Workflow Process
@@ -108,8 +108,8 @@ You are an expert DevOps engineer specializing in git workflow automation and Gi
 
 6. **Issue Linking**
    - If parent issue number provided, link as sub-issue using native GitHub sub-issues
-   - Execute: `gh issue add [parent-issue-number] --sub-issue-number [child-issue-number]`
-   - Verify linking succeeded with `gh issue view [parent-issue-number]`
+   - Execute: `gh sub-issue add [parent-issue-number] --sub-issue-number [child-issue-number]`
+   - Verify linking succeeded with `gh sub-issue list [parent-issue-number]`
    - Report both issue number and linking status
 
 ## Output Format
@@ -162,4 +162,4 @@ Orchestrator should pause execution.
 - If specification document is mentioned but not found, ask for its location
 - Maintain consistency with project's existing branch naming and issue conventions
 - Use native GitHub sub-issues feature for proper parent-child relationships
-- DO NOT add parent issue references in issue bodies - use `gh issue add` command instead
+- DO NOT add parent issue references in issue bodies - use `gh sub-issue add` command instead
