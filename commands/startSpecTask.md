@@ -24,6 +24,18 @@ This command:
 5. Executes the task using specified agents for each phase
 6. Updates status to complete when done
 
+## ⚠️ CRITICAL: WORKTREE CHECK FIRST ⚠️
+
+**STOP! Before doing ANYTHING else (including reading documentation or task files):**
+
+1. **CHECK** if you're in the correct worktree for this specification
+2. **CREATE/NAVIGATE** to the feature worktree if not already there
+3. **ONLY THEN** proceed with any other steps
+
+**NO EXCEPTIONS - This MUST happen before ANY file reads or operations**
+
+**Why?** All work MUST happen in the feature worktree, not the main repository. Reading files or checking tasks from the wrong location will cause problems.
+
 ## Task Status Format
 
 Tasks use this checkbox format:
@@ -142,12 +154,14 @@ await Promise.all([
 - **Independence**: Each agent works on separate files
 - **Consistency**: All tests written with same requirements context
 
-## Process
+## Process (WORKTREE FIRST - NO EXCEPTIONS)
 
-### 1. Worktree Setup Check (REQUIRED FIRST)
+### 1. 🚨 MANDATORY FIRST: Worktree Setup Check 🚨
 
-**Before ANY task execution**, the command MUST:
-- Check if we're already in the feature worktree for this specification
+**THIS MUST HAPPEN BEFORE ANYTHING ELSE - NO DOCUMENTATION, NO FILE READS, NOTHING!**
+
+**Before ANY other action**, the command MUST:
+- **IMMEDIATELY** check if we're already in the feature worktree for this specification
 - If NOT in the correct worktree:
   - Check if the feature worktree already exists (e.g., `feature/[spec-name]`)
   - If worktree doesn't exist:
@@ -158,7 +172,9 @@ await Promise.all([
 - Confirm we're in the feature worktree before proceeding
 - **Note**: The worktree is for the ENTIRE feature, not individual tasks
 
-### 2. Documentation Review (AFTER WORKTREE)
+**DO NOT PROCEED TO STEP 2 UNTIL WORKTREE IS CONFIRMED!**
+
+### 2. Documentation Review (ONLY AFTER WORKTREE IS CONFIRMED)
 
 **After ensuring correct worktree**, the command MUST:
 - Review `.kiro/specs/[spec_name]/requirements.md` to understand what's being built
@@ -299,16 +315,19 @@ When starting a task, displays:
 
 ```markdown
 ═══════════════════════════════════════════════════════════
-WORKTREE SETUP PHASE
+🚨 MANDATORY FIRST STEP: WORKTREE SETUP PHASE 🚨
 ═══════════════════════════════════════════════════════════
+THIS MUST HAPPEN BEFORE ANYTHING ELSE!
 Checking worktree status...
 ✓ Feature worktree: feature/[spec-name]
 ✓ Location: ../[spec-name]/
 ✓ Status: [Creating new | Using existing]
 ✓ Current directory: [worktree path]
 
+WORKTREE CONFIRMED - NOW PROCEEDING WITH OTHER STEPS
+
 ═══════════════════════════════════════════════════════════
-DOCUMENTATION REVIEW PHASE
+DOCUMENTATION REVIEW PHASE (Step 2 - After Worktree)
 ═══════════════════════════════════════════════════════════
 Reviewing:
 ✓ Requirements: .kiro/specs/[spec]/requirements.md
@@ -486,6 +505,19 @@ Next task: #5 - Implement authentication API endpoints
   - Create feature branch: `git checkout -b feature/[task-name]`
   - [Task-specific steps based on project context]...
 ```
+
+## ❌ Common Mistakes to Avoid
+
+**THESE WILL BREAK YOUR WORKFLOW:**
+
+1. **Starting ANY work before checking worktree** - This is the #1 mistake!
+2. **Reading task files before worktree setup** - You'll read from the wrong location
+3. **Reviewing documentation before worktree setup** - Documentation might be different in worktree
+4. **Assuming you're in the right directory** - Always verify explicitly
+5. **Checking git status before worktree check** - Worktree check comes FIRST
+6. **Looking at .kiro files before worktree** - These must be read from the worktree
+
+**Remember:** WORKTREE CHECK → THEN EVERYTHING ELSE
 
 ## Related Commands
 
