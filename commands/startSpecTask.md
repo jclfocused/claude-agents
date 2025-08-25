@@ -31,10 +31,24 @@ Tasks use this checkbox format:
 - `- [-]` In Progress
 - `- [x]` Complete
 
-## Important: Agents and Working Directory
+## Important: Worktrees, Branches, and Agents
+
+### Worktree and Branch Strategy
+- **Feature Worktree**: One worktree for the entire feature/specification
+  - Created once at the beginning (Task #0)
+  - Named: `feature/[spec-name]`
+  - Location: `../[spec-name]` relative to main repo
+  - This is the base branch for all task work
+- **Task Branches**: Regular branches within the worktree
+  - Created when starting each individual task (not in advance)
+  - Always branched from `feature/[spec-name]` (not from other task branches)
+  - Named: `task/[spec-name]-[number]-[description]`
+  - Merged back to feature branch after completion
+  - Deleted after merge to keep branch list clean
 
 ### Agent Awareness
 When executing tasks, the following specialized agents are available:
+- **start-git-task**: Creates task branch and GitHub sub-issues (user will create)
 - **tdd-red-phase**: For writing failing tests first (can use --no-verify)
 - **tdd-green-phase**: For implementing production-ready code
 - **mutation-test-runner**: For verifying test quality on new/modified files
@@ -46,12 +60,13 @@ When executing tasks, the following specialized agents are available:
 - **debug-log-cleaner**: For removing debug logs
 
 ### Working Directory
-**CRITICAL**: Always execute from the repository root directory, NOT the .kiro parent.
+**CRITICAL**: Always execute from the worktree directory, NOT the main repository.
 
 **Example Structure:**
-- .kiro location: `/workspace/planning/` (parent, not a git repo)
-- Repository: `/workspace/planning/web-app/` (actual git repository)
-- Execute from: `/workspace/planning/web-app/` (repository root)
+- Main repository: `/workspace/project/`
+- Feature worktree: `/workspace/project-user-auth/` (for user-auth spec)
+- .kiro location: `/workspace/project/.kiro/` (in main repo)
+- Execute from: `/workspace/project-user-auth/` (worktree directory)
 
 **Note**: If the project structure is unclear, the command should:
 1. Analyze the directory structure to find the actual repository
@@ -61,9 +76,23 @@ When executing tasks, the following specialized agents are available:
 
 ## Process
 
-### 1. Documentation Review (REQUIRED FIRST STEP)
+### 1. Worktree Setup Check (REQUIRED FIRST)
 
 **Before ANY task execution**, the command MUST:
+- Check if we're already in the feature worktree for this specification
+- If NOT in the correct worktree:
+  - Check if the feature worktree already exists (e.g., `feature/[spec-name]`)
+  - If worktree doesn't exist:
+    - Create it: `git worktree add ../[spec-name] -b feature/[spec-name]`
+    - Navigate to the new worktree directory
+  - If worktree exists:
+    - Navigate to the existing worktree directory
+- Confirm we're in the feature worktree before proceeding
+- **Note**: The worktree is for the ENTIRE feature, not individual tasks
+
+### 2. Documentation Review (AFTER WORKTREE)
+
+**After ensuring correct worktree**, the command MUST:
 - Review `.kiro/specs/[spec_name]/requirements.md` to understand what's being built
 - Review `.kiro/specs/[spec_name]/design.md` to understand the architecture
 - Review `.kiro/steering/` documents:
@@ -74,21 +103,31 @@ When executing tasks, the following specialized agents are available:
 - Review any `CLAUDE.md` files in relevant directories
 - Build complete context before proceeding
 
-### 2. Task Selection
+### 3. Task Selection
 
 After documentation review:
 - Read tasks from `.kiro/specs/[spec_name]/tasks.md`
+- Check if Task #0 exists (worktree setup task)
+- If Task #0 doesn't exist or isn't complete, notify user to add it
 - Find first task marked as `[-]` (in-progress)
 - If none, find first task marked as `[ ]` (pending)
 - If all complete, notify user
 - Handle nested subtasks appropriately
 
-### 3. Task Execution
+### 4. Task Execution
 
 For the selected task:
-- Updates status to `[-]` if pending
+- **Ensures we're on the feature branch first**:
+  - `git checkout feature/[spec-name]`
+  - Pull latest changes if needed
+- **Creates task-specific branch** from feature branch:
+  - Branch name: `task/[spec-name]-[task-number]-[brief-description]`
+  - Example: `task/user-auth-1-login-endpoint`
+  - Create with: `git checkout -b task/[name]`
+  - This ensures each task branches from the latest feature branch state
+- Updates task status to `[-]` if pending
 - Displays task number and description
-- **Shows working directory** (repository root, not .kiro parent)
+- **Shows working directory** (worktree directory)
 - **Identifies which agent to use** for each TDD phase
 - Shows all implementation steps
 - Highlights requirements being fulfilled
@@ -96,7 +135,7 @@ For the selected task:
 - **Updates documentation** after each major phase
 - Handles errors and rollback if needed
 
-### 4. Completion Handling
+### 5. Completion Handling
 
 After successful execution:
 - Updates task status to `[x]`
@@ -105,24 +144,55 @@ After successful execution:
   - Update README.md with new features/setup
   - Update/create CLAUDE.md files for patterns
   - Update steering docs if architecture changed
-- Commits all changes including documentation
+- Commits all changes to the task branch
+- **Merges task branch back to feature branch**:
+  - Ensure all changes are committed on task branch
+  - `git checkout feature/[spec-name]`
+  - `git merge task/[task-branch-name] --no-ff` (preserve merge history)
+  - Delete task branch: `git branch -d task/[task-branch-name]`
 - Shows completion summary
+- Returns to feature branch for next task
 - Identifies next task
 
 ## Example Usage
 
 ```bash
-# Start next task for user-authentication
+# First time - will prompt to create worktree
 /startSpecTask user-authentication
+# Creates: git worktree add ../user-authentication -b feature/user-authentication
+# Switches to feature/user-authentication branch
+# Then creates and checks out: task/user-auth-1-setup
+
+# Task 2 - uses existing worktree
+/startSpecTask user-authentication
+# Already in worktree
+# Switches to feature/user-authentication branch first
+# Creates new branch from feature: task/user-auth-2-login
+
+# Task 3 - always branches from feature, not task-2
+/startSpecTask user-authentication  
+# Switches to feature/user-authentication (has task 1 & 2 merged)
+# Creates: task/user-auth-3-validation (from feature, not task-2)
 
 # Reset in-progress tasks and start fresh
 /startSpecTask user-authentication --reset
-
-# Continue working on hello-world-setup
-/startSpecTask hello-world-setup
 ```
 
 ## Task State Management
+
+### Branch Flow Diagram
+```
+main/develop
+    └── feature/user-auth (worktree - created once)
+            ├── task/user-auth-1-setup (branches from feature)
+            │     └── (merges back to feature)
+            ├── task/user-auth-2-login (branches from feature, not task-1)
+            │     └── (merges back to feature)
+            └── task/user-auth-3-validation (branches from feature, not task-2)
+                  └── (merges back to feature)
+
+Each task ALWAYS branches from feature, NEVER from another task branch
+```
 
 ### State Transitions
 ```
@@ -150,6 +220,15 @@ When starting a task, displays:
 
 ```markdown
 ═══════════════════════════════════════════════════════════
+WORKTREE SETUP PHASE
+═══════════════════════════════════════════════════════════
+Checking worktree status...
+✓ Feature worktree: feature/[spec-name]
+✓ Location: ../[spec-name]/
+✓ Status: [Creating new | Using existing]
+✓ Current directory: [worktree path]
+
+═══════════════════════════════════════════════════════════
 DOCUMENTATION REVIEW PHASE
 ═══════════════════════════════════════════════════════════
 Reviewing:
@@ -164,7 +243,9 @@ Context built successfully. Proceeding to task...
 ═══════════════════════════════════════════════════════════
 Starting Task #2: [Task Description from tasks.md]
 Status: In Progress
-Working Directory: [auto-detected repository root]/
+Working Directory: [worktree directory]/
+Base Branch: feature/[spec-name] (checking out first)
+Task Branch: task/[spec-name]-2-[description] (creating from feature branch)
 ═══════════════════════════════════════════════════════════
 
 Note: Working directory is automatically determined by:
@@ -195,10 +276,11 @@ Press Enter to continue or Ctrl+C to abort...
 
 ### Step-by-Step Execution with Agents
 - Uses specified agent for each TDD phase
-- Executes from correct working directory (repository root)
+- Executes from correct working directory (worktree directory)
 - Shows command output from each agent
 - Validates success before continuing
 - Allows manual intervention if needed
+- Each task gets fresh branch from feature branch
 
 ### Error Handling
 - Detects command failures
@@ -265,10 +347,19 @@ Next task: #5 - Implement authentication API endpoints
 
 ## Task File Updates
 
-### Before Execution
+### Task #0 (Worktree Setup - Always First)
+```markdown
+- [ ] 0. Setup Feature Worktree
+  - Create worktree: `git worktree add ../[spec-name] -b feature/[spec-name]`
+  - Navigate to worktree directory
+  - Verify setup with `git status`
+  - This worktree will be used for ALL tasks in this specification
+```
+
+### Before Execution (Regular Tasks)
 ```markdown
 - [ ] 2. [Feature Implementation Task]
-  - Create feature branch: `git checkout -b feature/[task-name]`
+  - Create task branch: `git checkout -b task/[spec-name]-2-[description]`
   - [Task-specific steps based on project context]...
 ```
 
