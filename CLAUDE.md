@@ -132,6 +132,36 @@ Every development plan MUST explicitly include:
 - Final commit with proper message
 - **NO PUSH STEP** - Commits stay local only
 
+## Code Change Protocol
+
+### MANDATORY: Use cursor-agent for ALL Code Changes
+
+**CRITICAL**: All code modifications MUST be delegated to `cursor-agent`. Never use Edit/Write tools directly for code changes.
+
+- **Command Format**: `cursor-agent --force -p "description of changes"`
+  - `--force` flag is REQUIRED
+  - `-p` flag makes it headless and waits for completion
+  - Provide clear, specific descriptions of what needs to change
+- **Example**: `cursor-agent --force -p "change the login title to Log In Test"`
+- Break down complex changes into smaller, focused cursor-agent calls if needed
+- Read/Glob/Grep tools are fine for exploration and understanding code
+- Edit/Write tools should NOT be used for code modifications
+
+**Workflow for Code Changes**:
+1. Understand what needs to change (from requirements, issues, etc.)
+2. Explore codebase using Read/Glob/Grep to understand context
+3. Describe the change clearly: "Update login form to include email validation"
+4. Execute: `cursor-agent --force -p "Update login form to include email validation"`
+5. Wait for completion
+6. Verify changes meet requirements
+7. Commit changes
+
+**Why use cursor-agent?**
+- Faster execution
+- Better separation of concerns (planning vs implementation)
+- More reliable code generation
+- Consistent with project standards
+
 ## Code Quality Standards
 
 ### Linting Configuration
