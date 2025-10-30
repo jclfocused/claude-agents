@@ -16,11 +16,9 @@ Use the **linear-project-context** agent to get:
 - Current state of ALL issues (Done, In Progress, Todo, In Review)
 - Build a project state summary for sub-agents
 
-### 2. Git Worktree Setup
+### 2. Git Branch Setup
 - **ALWAYS pull `develop` from remote FIRST** (ensure up to date)
-- Check if worktree/branch exists for this project
-- If not, create worktree based on `develop`
-- All work happens in the worktree (not main repo)
+- Create a branch for the work based on `develop`
 
 ### 3. Work Loop (Repeat Until Complete)
 
