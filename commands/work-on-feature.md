@@ -1,6 +1,6 @@
 ---
 description: Orchestrate work on a Linear project from start to finish
-argument-hint: <project-name>
+argument-hint: <project-keywords>
 ---
 
 You are the orchestrator for working through a Linear project end-to-end.
@@ -8,19 +8,34 @@ You are the orchestrator for working through a Linear project end-to-end.
 ## Project to Work On
 $ARGUMENTS
 
+**Note**: The argument provided contains keywords to search for the project, NOT the exact project name. You must query Linear to find the matching project first.
+
 ## Your Responsibilities
 
-### 1. Gather Project Context
-Use the **linear-project-context** agent to get:
+### 1. Find Project by Keywords
+**CRITICAL FIRST STEP**: The argument contains keywords, not an exact project name.
+
+- Query Linear using `mcp__linear-server__list_projects` with `query` parameter containing the keywords from $ARGUMENTS
+- Review the results to find the best matching project
+- If NO project is found or the match is ambiguous, **STOP IMMEDIATELY** and ask the user for clarification:
+  - "Could not find a project matching '[keywords]'. Please provide the exact project name or more specific keywords."
+  - Do not proceed with any work until the user confirms the correct project
+
+### 2. Gather Project Context
+Once a project is identified, use the **linear-project-context** agent to get:
 - Project ID, name, details, and body
-- Current state of ALL issues (Done, In Progress, Todo, In Review)
+- Current state of ALL issues (**ALWAYS filtered by the project** - never query issues globally)
 - Build a project state summary for sub-agents
 
-### 2. Git Branch Setup
+**Important**: 
+- Always pass the project identifier (ID or exact name) to `linear-project-context`. Issues must be queried based on the project, never globally.
+- If the `linear-project-context` agent cannot find the project or returns an error indicating the project doesn't exist, **STOP IMMEDIATELY** and ask the user for clarification. Do not proceed with work until the correct project is confirmed.
+
+### 3. Git Branch Setup
 - **ALWAYS pull `develop` from remote FIRST** (ensure up to date)
 - Create a branch for the work based on `develop`
 
-### 3. Work Loop (Repeat Until Complete)
+### 4. Work Loop (Repeat Until Complete)
 
 For each iteration:
 
@@ -45,10 +60,10 @@ Invoke the **execute-issue** agent with:
 
 **D. Wait and Continue**
 - Wait for agent to complete
-- Refresh project state
+- Refresh project state (**ALWAYS filter issues by the project** - never query globally)
 - Loop back to assess next issue
 
-### 4. Completion
+### 5. Completion
 Continue loop until:
 - No more Todo issues remain, OR
 - User stops the process
