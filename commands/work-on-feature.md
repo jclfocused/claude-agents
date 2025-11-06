@@ -8,34 +8,31 @@ You are the orchestrator for working through a Linear project end-to-end.
 ## Project to Work On
 $ARGUMENTS
 
-**Note**: The argument provided contains keywords to search for the project, NOT the exact project name. You must query Linear to find the matching project first.
+**Note**: The argument provided contains keywords to search for the project, NOT the exact project name. The sub-agent will handle finding and fetching the project to keep context lean.
 
 ## Your Responsibilities
 
-### 1. Find Project by Keywords
-**CRITICAL FIRST STEP**: The argument contains keywords, not an exact project name.
+### 1. Gather Project Context via Sub-Agent
+**DELEGATE TO SUB-AGENT**: To avoid bloating the main context, delegate all project lookup and fetching to the **linear-project-context** agent.
 
-- Query Linear using `mcp__linear-server__list_projects` with `query` parameter containing the keywords from $ARGUMENTS
-- Review the results to find the best matching project
-- If NO project is found or the match is ambiguous, **STOP IMMEDIATELY** and ask the user for clarification:
-  - "Could not find a project matching '[keywords]'. Please provide the exact project name or more specific keywords."
-  - Do not proceed with any work until the user confirms the correct project
-
-### 2. Gather Project Context
-Once a project is identified, use the **linear-project-context** agent to get:
-- Project ID, name, details, and body
-- Current state of ALL issues (**ALWAYS filtered by the project** - never query issues globally)
-- Build a project state summary for sub-agents
+- Pass the keywords from $ARGUMENTS directly to **linear-project-context** agent
+- The sub-agent will:
+  - Search for the project using the provided keywords
+  - Fetch full project details (ID, name, body, etc.)
+  - Retrieve all active issues filtered by the project (never global queries)
+  - Return the **project UUID** as part of its output
+- The agent will handle project matching and error reporting if the project cannot be found
 
 **Important**: 
-- Always pass the project identifier (ID or exact name) to `linear-project-context`. Issues must be queried based on the project, never globally.
+- **Do NOT** query Linear directly in the main command - let the sub-agent handle all Linear API calls
 - If the `linear-project-context` agent cannot find the project or returns an error indicating the project doesn't exist, **STOP IMMEDIATELY** and ask the user for clarification. Do not proceed with work until the correct project is confirmed.
+- Extract and store the **project UUID** from the sub-agent's response for use in subsequent steps
 
-### 3. Git Branch Setup
+### 2. Git Branch Setup
 - **ALWAYS pull `develop` from remote FIRST** (ensure up to date)
 - Create a branch for the work based on `develop`
 
-### 4. Work Loop (Repeat Until Complete)
+### 3. Work Loop (Repeat Until Complete)
 
 For each iteration:
 
@@ -63,7 +60,7 @@ Invoke the **execute-issue** agent with:
 - Refresh project state (**ALWAYS filter issues by the project** - never query globally)
 - Loop back to assess next issue
 
-### 5. Completion
+### 4. Completion
 Continue loop until:
 - No more Todo issues remain, OR
 - User stops the process
