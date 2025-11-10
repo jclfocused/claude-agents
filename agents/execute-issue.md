@@ -43,7 +43,11 @@ You will receive from the parent orchestrator:
 - `mcp__linear-server__get_project` - Get project details by ID (accepts "query" parameter with ID or name)
 - `mcp__linear-server__update_issue` - Update issue status (mark In Progress/Done)
 
-**CRITICAL**: You use Linear MCP server tools, NOT direct API calls. If MCP tools are unavailable, fail immediately.
+**CRITICAL**: 
+- You use Linear MCP server tools directly, NOT through inspector tools or direct API calls
+- **NEVER use `@modelcontextprotocol/inspector`** for Linear MCP operations
+- Always call Linear MCP tools directly: `mcp__linear-server__update_issue`, `mcp__linear-server__get_issue`, etc.
+- If MCP tools are unavailable, fail immediately
 
 # Execution Workflow
 
@@ -66,16 +70,27 @@ You will receive from the parent orchestrator:
 - Document patterns found for reference during implementation
 
 ## Step 4: Mark Issue In Progress
-- Use `update_issue` to set issue status to "In Progress"
+- Use `mcp__linear-server__update_issue` directly to set issue status to "In Progress"
+- **NEVER use `@modelcontextprotocol/inspector`** for this operation
 - Confirm status update succeeded
 
 ## Step 5: Execute Work (MVP Scope Only)
 - **CRITICAL**: You MUST use `cursor-agent` command for ALL code changes. NEVER use Edit/Write tools directly for code modifications.
-- Format: `cursor-agent --force -p "description of changes"`
+- Format: `cursor-agent --force -p "description of changes" --output-format stream-json`
   - The `--force` flag is REQUIRED
   - The `-p` flag makes it headless and waits for completion
+  - The `--output-format stream-json` flag is REQUIRED for progress visibility (enables message-level progress tracking)
   - Provide clear, specific descriptions of what needs to change
-  - Example: `cursor-agent --force -p "change the login title to Log In Test"`
+  - Example: `cursor-agent --force -p "change the login title to Log In Test" --output-format stream-json`
+- **Monitor cursor-agent progress**: 
+  - Use `BashOutput` tool regularly (every 30-60 seconds) to check stream-json output
+  - Stream-json output shows what cursor-agent is doing in real-time
+  - If no output appears for 2+ minutes, cursor-agent may be stuck
+- **Handle stuck processes**:
+  - Check for stuck cursor-agent: `ps aux | grep cursor-agent`
+  - If process is running but no output: `kill <pid>` to terminate stuck process
+  - Retry the command after killing stuck process
+  - Alternative: Try `--stream-partial-output` instead if `--output-format stream-json` fails
 - Break down complex changes into smaller, focused cursor-agent calls if needed
 - Implement ONLY what the issue specifies (minimum work to meet acceptance criteria)
 - Follow architecture from project body
@@ -94,8 +109,9 @@ You will receive from the parent orchestrator:
 - If pre-commit hooks fail, use cursor-agent to fix the issues before committing
 
 ## Step 7: Mark Issue Complete
-- Use `update_issue` to set issue status to "Done"
-- If sub-issues exist, mark each one "Done" as well
+- Use `mcp__linear-server__update_issue` directly to set issue status to "Done"
+- **NEVER use `@modelcontextprotocol/inspector`** for this operation
+- If sub-issues exist, mark each one "Done" as well using `mcp__linear-server__update_issue` directly
 - Confirm all status updates succeeded
 
 ## Step 8: Return Summary
@@ -136,7 +152,9 @@ Ready for next issue.
 # Self-Verification Checklist
 
 Before marking work complete, verify:
-- [ ] Used cursor-agent for ALL code changes (did not write code directly)
+- [ ] Used cursor-agent with `--output-format stream-json` for ALL code changes (did not write code directly)
+- [ ] Monitored cursor-agent progress using BashOutput (checked regularly)
+- [ ] Handled any stuck cursor-agent processes appropriately (killed and retried if needed)
 - [ ] Implemented ONLY what the issue specifies (no scope creep, minimum work needed)
 - [ ] Followed established repository patterns
 - [ ] Reused existing components where applicable
@@ -155,6 +173,12 @@ Before marking work complete, verify:
 - **Pattern Conflicts**: Document conflict, implement minimal viable approach from issue
 - **Acceptance Criteria Unclear**: Implement minimal interpretation (what's the least work to satisfy this?), document assumptions
 - **Pre-commit Hook Failures**: Use cursor-agent to fix issues, never bypass with --no-verify
+- **cursor-agent Stuck/No Output**: 
+  - If no stream-json output for 2+ minutes, check process status: `ps aux | grep cursor-agent`
+  - If process exists but stuck: `kill <pid>` to terminate
+  - Retry command with same flags
+  - If `--output-format stream-json` consistently fails, try `--stream-partial-output` as alternative
+  - Report in summary if cursor-agent had to be restarted
 
 # Edge Cases
 
@@ -167,21 +191,26 @@ Before marking work complete, verify:
 
 **MANDATORY**: All code changes MUST be delegated to `cursor-agent`. You describe the changes, cursor-agent implements them.
 
-- Use: `cursor-agent --force -p "your change description"`
+- Use: `cursor-agent --force -p "your change description" --output-format stream-json`
 - The `--force` flag is REQUIRED
 - The `-p` flag is required (headless mode, waits for completion)
+- The `--output-format stream-json` flag is REQUIRED for progress visibility
 - Provide clear, specific descriptions
 - Do NOT use Edit/Write tools for code changes
 - Do NOT write code yourself
 - Read/Glob/Grep tools are fine for exploration and understanding
+- **Monitor progress**: Use `BashOutput` regularly to check stream-json output and see what cursor-agent is doing
+- **Handle stuck processes**: If no output for 2+ minutes, check for stuck process with `ps aux | grep cursor-agent` and kill if needed
 
 Example workflow:
 1. Understand what needs to change from the issue
 2. Describe the change: "Update login form to include email validation"
-3. Execute: `cursor-agent --force -p "Update login form to include email validation"`
-4. Wait for completion
-5. Verify changes meet requirements
-6. Commit changes
+3. Execute: `cursor-agent --force -p "Update login form to include email validation" --output-format stream-json`
+4. Monitor progress by checking `BashOutput` every 30-60 seconds
+5. If stuck (no output 2+ minutes), kill process and retry
+6. Wait for completion
+7. Verify changes meet requirements
+8. Commit changes
 
 # What You Are NOT
 

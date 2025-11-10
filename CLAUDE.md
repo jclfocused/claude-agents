@@ -138,11 +138,12 @@ Every development plan MUST explicitly include:
 
 **CRITICAL**: All code modifications MUST be delegated to `cursor-agent`. Never use Edit/Write tools directly for code changes.
 
-- **Command Format**: `cursor-agent --force -p "description of changes"`
+- **Command Format**: `cursor-agent --force -p "description of changes" --output-format stream-json`
   - `--force` flag is REQUIRED
   - `-p` flag makes it headless and waits for completion
+  - `--output-format stream-json` REQUIRED for progress visibility (enables message-level progress tracking so agent can see what's happening)
   - Provide clear, specific descriptions of what needs to change
-- **Example**: `cursor-agent --force -p "change the login title to Log In Test"`
+- **Example**: `cursor-agent --force -p "change the login title to Log In Test" --output-format stream-json`
 - Break down complex changes into smaller, focused cursor-agent calls if needed
 - Read/Glob/Grep tools are fine for exploration and understanding code
 - Edit/Write tools should NOT be used for code modifications
@@ -151,10 +152,20 @@ Every development plan MUST explicitly include:
 1. Understand what needs to change (from requirements, issues, etc.)
 2. Explore codebase using Read/Glob/Grep to understand context
 3. Describe the change clearly: "Update login form to include email validation"
-4. Execute: `cursor-agent --force -p "Update login form to include email validation"`
-5. Wait for completion
-6. Verify changes meet requirements
-7. Commit changes
+4. Execute: `cursor-agent --force -p "Update login form to include email validation" --output-format stream-json`
+5. Monitor progress through stream-json output (check BashOutput regularly to see progress)
+6. If cursor-agent appears stuck (no output for 2+ minutes), check for stuck processes and kill if needed
+7. Wait for completion
+8. Verify changes meet requirements
+9. Commit changes
+
+**Handling Stuck cursor-agent Processes**:
+- **Monitor Progress**: Use `BashOutput` tool regularly to check stream-json output and see what cursor-agent is doing
+- **Timeout Strategy**: If no stream-json output appears for 2+ minutes, cursor-agent may be stuck
+- **Check for Stuck Process**: Look for cursor-agent processes that are running but not producing output
+- **Kill Stuck Process**: If stuck, use `ps aux | grep cursor-agent` to find process ID, then `kill <pid>` to terminate
+- **Retry Strategy**: After killing stuck process, retry the cursor-agent command with the same flags
+- **Alternative**: If streaming consistently fails, try `--stream-partial-output` instead of `--output-format stream-json`
 
 **Why use cursor-agent?**
 - Faster execution
