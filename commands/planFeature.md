@@ -27,35 +27,51 @@ First, list all existing Linear projects with their current status:
    - If user selects first option: store null
    - Otherwise: store the corresponding project ID from the selected option
 
-## Step 2: Create Feature Issues
+## Step 2: Codebase Investigation (Using Parallel Code Explorer Agents)
 
-Use the **linear-mvp-project-creator** agent to create this feature. Pass the selected project ID (or null) to the agent.
+Before creating the feature issues, investigate the codebase using parallel code-explorer agents:
+
+1. **Dynamically Identify Investigation Areas**: Based on the feature description, determine which 2-4 specific areas of the codebase need investigation:
+   - What parts of the codebase will be touched?
+   - What similar features exist that we can learn from?
+   - What patterns and conventions should we follow?
+   - What integration points need to be understood?
+   - Example areas (adapt based on feature): "Current frontend component structure", "API endpoint patterns", "Database schema for similar features", "Authentication flow", "Testing patterns"
+
+2. **Spin Up Parallel Code Explorer Agents**: Use the Task tool with `subagent_type='feature-dev:code-explorer'` to launch multiple agents in parallel:
+   - **CRITICAL**: Use the full agent name `feature-dev:code-explorer` (plugin prefix required)
+   - **IMPORTANT**: Call multiple Task tools in a single message to run agents in parallel
+   - Launch 2-4 agents simultaneously, each investigating a different area you identified
+   - Each agent receives a focused prompt describing what to investigate
+   - Agent prompts should be specific and clear about the investigation goal
+   - Example: One agent investigates "Current frontend component structure and reusable UI patterns", another investigates "Existing API endpoint architecture and routing patterns"
+
+3. **Consolidate Investigation Findings**: After all parallel agents complete, review and consolidate their findings into a structured summary that will be passed to the linear-mvp-project-creator agent.
+
+## Step 3: Create Feature Issues
+
+Use the **linear-mvp-project-creator** agent to create this feature. Pass:
+- The selected project ID (or null) to the agent
+- The consolidated codebase investigation findings from Step 2
 
 **IMPORTANT**: The agent will ensure the parent issue is labeled with "Feature Root" for easy identification and filtering of all root feature issues.
 
 The agent will:
 
-1. **Investigate the codebase** thoroughly to understand:
-   - Existing patterns and architecture
-   - Similar features that already exist
-   - Bad patterns that need refactoring
-   - Atomic design components (for UI features)
-
-2. **Iterative Clarification Loop** - The agent will ask you clarifying questions to ensure full understanding:
-   - After initial investigation, agent will ask questions about ambiguities, approach choices, or missing requirements
-   - Based on your answers, agent may do additional research
-   - Agent will continue asking questions and researching until satisfied with understanding
+1. **Iterative Clarification Loop** - The agent will ask you clarifying questions to ensure full understanding:
+   - Agent will ask questions about ambiguities, approach choices, or missing requirements based on the investigation findings
+   - Agent will continue asking questions until satisfied with understanding
    - **Be prepared to answer multiple rounds of questions** - this ensures a well-planned feature
 
-3. **Create a parent issue** with description structured as:
+2. **Create a parent issue** with description structured as:
    - **IMPORTANT section** with Linear issue discipline rules
    - **Problem** statement
    - **Solution** approach
    - **High-level implementation** details
-   - **Codebase investigation findings**
+   - **Codebase investigation findings** (from Step 2)
    - **Atomic design components** (if UI feature)
 
-4. **Create nested issues** following these principles:
+3. **Create nested issues** following these principles:
    - All issues as direct sub-issues of the parent or nested further
    - Top-level sub-issues = Vertical slices (potential PRs)
    - Include deeper nesting for logical breakdown

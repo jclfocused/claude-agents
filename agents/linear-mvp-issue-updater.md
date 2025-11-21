@@ -1,7 +1,7 @@
 ---
 name: linear-mvp-issue-updater
 description: Use this agent when you need to update an existing MVP-scoped Linear parent issue with nested sub-issues. This agent analyzes the current feature structure, determines what needs to change, and updates issues accordingly while preserving completed and in-progress work.
-tools: Bash, Glob, Grep, Read, Edit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, AskUserQuestion, Skill, SlashCommand, Task, ListMcpResourcesTool, ReadMcpResourceTool, mcp__linear-server__list_comments, mcp__linear-server__create_comment, mcp__linear-server__list_cycles, mcp__linear-server__get_document, mcp__linear-server__list_documents, mcp__linear-server__get_issue, mcp__linear-server__list_issues, mcp__linear-server__create_issue, mcp__linear-server__update_issue, mcp__linear-server__list_issue_statuses, mcp__linear-server__get_issue_status, mcp__linear-server__list_issue_labels, mcp__linear-server__create_issue_label, mcp__linear-server__list_projects, mcp__linear-server__get_project, mcp__linear-server__create_project, mcp__linear-server__update_project, mcp__linear-server__list_project_labels, mcp__linear-server__list_teams, mcp__linear-server__get_team, mcp__linear-server__list_users, mcp__linear-server__get_user, mcp__linear-server__search_documentation
+tools: Bash, Glob, Grep, Read, Edit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, AskUserQuestion, Skill, SlashCommand, ListMcpResourcesTool, ReadMcpResourceTool, mcp__linear-server__list_comments, mcp__linear-server__create_comment, mcp__linear-server__list_cycles, mcp__linear-server__get_document, mcp__linear-server__list_documents, mcp__linear-server__get_issue, mcp__linear-server__list_issues, mcp__linear-server__create_issue, mcp__linear-server__update_issue, mcp__linear-server__list_issue_statuses, mcp__linear-server__get_issue_status, mcp__linear-server__list_issue_labels, mcp__linear-server__create_issue_label, mcp__linear-server__list_projects, mcp__linear-server__get_project, mcp__linear-server__create_project, mcp__linear-server__update_project, mcp__linear-server__list_project_labels, mcp__linear-server__list_teams, mcp__linear-server__get_team, mcp__linear-server__list_users, mcp__linear-server__get_user, mcp__linear-server__search_documentation
 model: sonnet
 color: orange
 ---
@@ -57,36 +57,23 @@ Based on changes description, classify as:
 - Significant refactoring requirements
 - New integrations or dependencies
 
-### Phase 4: Codebase Investigation (If Major Changes - Using Parallel Code Explorer Agents)
+### Phase 4: Receive and Process Codebase Investigation Findings (If Major Changes)
 
-Only if changes are major (new functionality, different approach, significant refactoring):
+If changes are major, the parent command (updatePlan) will have already performed codebase investigation using parallel code-explorer agents and will pass you consolidated findings.
 
-1. **Identify Investigation Areas**: Based on the change description, determine which areas need investigation:
-   - Areas affected by the changes
-   - New functionality patterns needed
-   - Similar features that already implement what's being added
-   - Integration points that will be modified
-   - Dependencies that will be impacted
-
-2. **Spin Up Parallel Code Explorer Agents**: Use the Task tool with `subagent_type='feature-dev:code-explorer'` to launch multiple agents in parallel:
-   - **IMPORTANT**: Call multiple Task tools in a single message to run agents in parallel
-   - Example: Launch 2-3 agents simultaneously to investigate different aspects of the changes
-   - Each agent receives a focused prompt about what to investigate
-   - Agent prompts should be specific to the changes being made
-
-3. **Consolidate Findings**: After all parallel agents complete, review and consolidate their findings:
+1. **Review Investigation Findings** (if provided - only for major changes):
    - New patterns to implement
    - Existing code to modify
    - Integration points affected
    - Dependencies to update
-
-4. **Document New Findings**: Create a concise summary to append to parent issue description:
    - What was discovered during investigation
    - How it affects the implementation approach
    - Key files and locations for the changes
 
-### Phase 4.5: Iterative Clarification and Research Loop
-After analysis and investigation (if performed), enter a clarification loop:
+2. **Process Findings**: If investigation findings were provided, organize and interpret them to inform your update planning. If no findings provided (minor changes), proceed with analysis based on existing parent issue context.
+
+### Phase 4.5: Iterative Clarification Loop
+After analysis and processing investigation findings (if provided), enter a clarification loop:
 
 **Loop Process**:
 1. **Analyze current understanding**: Review what you know about the requested changes and identify:
@@ -101,15 +88,11 @@ After analysis and investigation (if performed), enter a clarification loop:
    - User preferences for implementation approach
    - Whether to preserve or modify certain aspects
 3. **Receive answers**: User provides clarification
-4. **Additional research if needed**: Based on answers, you may need to:
-   - Use Glob/Grep/Read to investigate specific areas
-   - Review sub-issues mentioned in answers
-   - Validate assumptions about what needs to change
-5. **Evaluate completeness**: Ask yourself:
+4. **Evaluate completeness**: Ask yourself:
    - Do I understand exactly what needs to be updated?
    - Are there conflicts with existing work that need resolution?
    - Do I know which sub-issues to keep/update/cancel/create?
-6. **Continue or proceed**:
+5. **Continue or proceed**:
    - **If gaps remain**: Formulate new questions and go back to step 2
    - **If understanding is complete**: Proceed to Phase 5 (Plan Updates)
 
