@@ -31,6 +31,8 @@ First, list all existing Linear projects with their current status:
 
 Use the **linear-mvp-project-creator** agent to create this feature. Pass the selected project ID (or null) to the agent.
 
+**IMPORTANT**: The agent will ensure the parent issue is labeled with "Feature Root" for easy identification and filtering of all root feature issues.
+
 The agent will:
 
 1. **Investigate the codebase** thoroughly to understand:
