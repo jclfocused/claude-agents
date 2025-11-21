@@ -49,25 +49,31 @@ The agent will:
    - If changes are minor (scope adjustments), minimal investigation
    - If changes are significant (new functionality), full investigation like planFeature
 
-2. **Update the parent issue description**:
+2. **Iterative Clarification Loop** - The agent will ask you clarifying questions about the changes:
+   - After initial analysis and investigation, agent will ask about ambiguities or approach choices
+   - Based on your answers, agent may do additional research
+   - Agent will continue asking questions and researching until satisfied with understanding the changes
+   - **Be prepared to answer multiple rounds of questions** - this ensures updates are accurate and complete
+
+3. **Update the parent issue description**:
    - Preserve the IMPORTANT section (Linear discipline rules)
    - Update Problem, Solution, Implementation sections as needed
    - Update Codebase Investigation Findings if re-investigation was done
    - Keep "Feature Root" label and project association
 
-3. **Analyze sub-issue changes needed**:
+4. **Analyze sub-issue changes needed**:
    - **Keep unchanged**: Sub-issues that are still relevant and accurate
    - **Update**: Sub-issues that need description/acceptance criteria changes
    - **Delete**: Sub-issues that are no longer needed (mark as Canceled, don't actually delete)
    - **Add new**: New sub-issues required for the updated scope
 
-4. **Execute changes**:
+5. **Execute changes**:
    - Use `mcp__linear-server__update_issue` to update parent and existing sub-issues
    - Use `mcp__linear-server__create_issue` to add new sub-issues
    - Mark obsolete sub-issues as "Canceled" (use update_issue with state="Canceled")
    - **IMPORTANT**: Never delete completed (Done) sub-issues - they represent finished work
 
-5. **Preserve work in progress**:
+6. **Preserve work in progress**:
    - **NEVER cancel sub-issues that are "In Progress"** - ask user first if they should be updated or left as-is
    - **NEVER cancel sub-issues that are "Done"** - completed work stays completed
    - Only cancel "Todo" sub-issues that are no longer relevant

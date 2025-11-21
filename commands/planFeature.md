@@ -41,7 +41,13 @@ The agent will:
    - Bad patterns that need refactoring
    - Atomic design components (for UI features)
 
-2. **Create a parent issue** with description structured as:
+2. **Iterative Clarification Loop** - The agent will ask you clarifying questions to ensure full understanding:
+   - After initial investigation, agent will ask questions about ambiguities, approach choices, or missing requirements
+   - Based on your answers, agent may do additional research
+   - Agent will continue asking questions and researching until satisfied with understanding
+   - **Be prepared to answer multiple rounds of questions** - this ensures a well-planned feature
+
+3. **Create a parent issue** with description structured as:
    - **IMPORTANT section** with Linear issue discipline rules
    - **Problem** statement
    - **Solution** approach
@@ -49,7 +55,7 @@ The agent will:
    - **Codebase investigation findings**
    - **Atomic design components** (if UI feature)
 
-3. **Create nested issues** following these principles:
+4. **Create nested issues** following these principles:
    - All issues as direct sub-issues of the parent or nested further
    - Top-level sub-issues = Vertical slices (potential PRs)
    - Include deeper nesting for logical breakdown

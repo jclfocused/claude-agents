@@ -64,7 +64,41 @@ Only if changes are major:
 3. Use Read to understand implementation details
 4. Document new findings to append to parent issue
 
-### Phase 5: Plan Updates
+### Phase 4.5: Iterative Clarification and Research Loop
+After analysis and investigation (if performed), enter a clarification loop:
+
+**Loop Process**:
+1. **Analyze current understanding**: Review what you know about the requested changes and identify:
+   - Ambiguities in the change description
+   - Multiple possible approaches to implementing changes
+   - Impact on existing in-progress or completed work
+   - Missing information needed to update accurately
+2. **Formulate clarifying questions**: Use AskUserQuestion to ask about:
+   - Specific details of what should change
+   - How to handle conflicts with existing work
+   - Which sub-issues should be updated vs canceled vs kept
+   - User preferences for implementation approach
+   - Whether to preserve or modify certain aspects
+3. **Receive answers**: User provides clarification
+4. **Additional research if needed**: Based on answers, you may need to:
+   - Use Glob/Grep/Read to investigate specific areas
+   - Review sub-issues mentioned in answers
+   - Validate assumptions about what needs to change
+5. **Evaluate completeness**: Ask yourself:
+   - Do I understand exactly what needs to be updated?
+   - Are there conflicts with existing work that need resolution?
+   - Do I know which sub-issues to keep/update/cancel/create?
+6. **Continue or proceed**:
+   - **If gaps remain**: Formulate new questions and go back to step 2
+   - **If understanding is complete**: Proceed to Phase 5 (Plan Updates)
+
+**Important Guidelines**:
+- **Ask questions in batches**: Group related questions using AskUserQuestion (up to 4 questions per call)
+- **Focus on changes**: Don't ask about things that aren't changing
+- **Protect existing work**: If changes conflict with Done/In Progress work, ALWAYS ask user how to handle
+- **Know when to stop**: Usually 1-2 rounds sufficient. Don't over-clarify minor updates.
+
+### Phase 5: Plan Updates (after clarification loop completes)
 1. **Parent Issue Updates**:
    - Identify which sections of description need updates
    - Preserve IMPORTANT section (Linear discipline rules)
@@ -79,7 +113,7 @@ Only if changes are major:
    - **Create new**: New sub-issues required by updated scope
    - **Ask user about In Progress**: If in-progress work conflicts with changes, ask user
 
-### Phase 6: Execute Updates
+### Phase 6: Execute Updates (after clarification loop completes)
 
 **Parent Issue Update**:
 - Use `mcp__linear-server__update_issue` with parent issue ID
@@ -161,6 +195,8 @@ Feature plan updated successfully. Work can continue with updated scope.
    - [ ] Current state fully analyzed before making changes
    - [ ] Change scope determined (minor vs major)
    - [ ] Codebase investigation completed if major changes
+   - [ ] Clarification loop completed (asked questions, got answers, researched based on answers)
+   - [ ] All ambiguities about changes resolved through clarification
    - [ ] No "Done" issues modified
    - [ ] "In Progress" issues handled with user input if needed
    - [ ] Parent issue IMPORTANT section preserved
