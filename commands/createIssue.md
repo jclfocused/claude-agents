@@ -12,10 +12,9 @@ $ARGUMENTS
 
 First, list all existing Feature Root issues for optional parent association:
 
-1. Use `mcp__linear-server__list_issue_labels` to find the "Feature Root" label ID
-2. Use `mcp__linear-server__list_issues` with `label: "Feature Root"` to fetch all root feature issues
-3. **Filter to active features**: Exclude issues with status "Done" or "Canceled"
-4. Use `AskUserQuestion` to prompt the user with all active features plus a "no parent" option:
+1. Use `mcp__linear-server__list_issues` with `label: "Feature Root"` to fetch all root feature issues (filter directly by label name - don't check for label existence first)
+2. **Filter to active features**: Exclude issues with status "Done" or "Canceled"
+3. Use `AskUserQuestion` to prompt the user with all active features plus a "no parent" option:
    - **question**: "Should this issue be associated with a feature parent?"
    - **header**: "Parent Feature Selection"
    - **multiSelect**: false
@@ -24,7 +23,7 @@ First, list all existing Feature Root issues for optional parent association:
      - Remaining options: One for each feature root with:
        - `label`: "[Issue ID] - [Feature Title] - [Status]"
        - `description`: First 100 chars of issue description or "No description"
-5. Store the selected parent issue ID (or null if "No Parent" was selected)
+4. Store the selected parent issue ID (or null if "No Parent" was selected)
 
 ## Step 2: Create Issue with Research
 

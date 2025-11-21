@@ -12,17 +12,16 @@ $ARGUMENTS
 
 First, list all existing feature root issues:
 
-1. Use `mcp__linear-server__list_issue_labels` to find the "Feature Root" label ID
-2. Use `mcp__linear-server__list_issues` with `label: "Feature Root"` to fetch all root feature issues
-3. **Filter to active features**: Exclude issues with status "Done" or "Canceled"
-4. Use `AskUserQuestion` to prompt the user to select which feature to update:
+1. Use `mcp__linear-server__list_issues` with `label: "Feature Root"` to fetch all root feature issues (filter directly by label name - don't check for label existence first)
+2. **Filter to active features**: Exclude issues with status "Done" or "Canceled"
+3. Use `AskUserQuestion` to prompt the user to select which feature to update:
    - **question**: "Which feature plan should be updated?"
    - **header**: "Feature Selection"
    - **multiSelect**: false
    - **options**: Build array with one option for each feature issue:
      - `label`: "[Issue ID] - [Feature Title] - [Status]"
      - `description`: First 100 chars of issue description or "No description"
-5. Store the selected parent issue ID
+4. Store the selected parent issue ID
 
 ## Step 2: Load Current Feature State
 
