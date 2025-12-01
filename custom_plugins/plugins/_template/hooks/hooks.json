@@ -1,0 +1,17 @@
+{
+  "description": "Example hooks - customize for your plugin",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/example_hook.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "custom-plugins",
+  "version": "1.0.0",
+  "description": "Custom local plugins for Claude Code",
+  "owner": {
+    "name": "LaserFocused OU",
+    "email": "justin@laserfocused.ee"
+  },
+  "plugins": [
+    {
+      "name": "linear-planning-workflow",
+      "description": "MVP-focused feature planning and execution workflow for Linear. Includes commands for planning features, creating issues, updating plans, and orchestrating work through Linear sub-issues.",
+      "version": "1.0.0",
+      "author": {
+        "name": "LaserFocused OU",
+        "email": "justin@laserfocused.ee"
+      },
+      "source": "./plugins/linear-planning-workflow",
+      "category": "productivity",
+      "keywords": ["linear", "planning", "workflow", "mvp", "issues", "features"]
+    },
+    {
+      "name": "jira-planning-workflow",
+      "description": "MVP-focused feature planning and execution workflow for Jira. Includes commands for planning features as Stories with flat Subtasks, creating issues, and orchestrating work.",
+      "version": "1.0.0",
+      "author": {
+        "name": "LaserFocused OU",
+        "email": "justin@laserfocused.ee"
+      },
+      "source": "./plugins/jira-planning-workflow",
+      "category": "productivity",
+      "keywords": ["jira", "planning", "workflow", "mvp", "stories", "subtasks"]
+    }
+  ]
+}

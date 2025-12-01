@@ -1,0 +1,9 @@
+{
+  "name": "_template",
+  "version": "1.0.0",
+  "description": "Template plugin - copy this directory to create new plugins",
+  "author": {
+    "name": "LaserFocused OU",
+    "email": "justin@laserfocused.ee"
+  }
+}

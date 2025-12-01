@@ -1,0 +1,11 @@
+{
+  "name": "linear-planning-workflow",
+  "version": "1.0.0",
+  "description": "MVP-focused feature planning and execution workflow for Linear. Includes commands for planning features, creating issues, updating plans, and orchestrating work through Linear sub-issues.",
+  "author": {
+    "name": "LaserFocused OU",
+    "email": "justin@laserfocused.ee"
+  },
+  "keywords": ["linear", "planning", "workflow", "mvp", "issues", "features"],
+  "mcpServers": "../.mcp.json"
+}

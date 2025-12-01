@@ -1,0 +1,39 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "laserfocused-plugins",
+  "version": "1.0.0",
+  "description": "MVP-focused planning and workflow plugins for Linear and Jira by LaserFocused",
+  "owner": {
+    "name": "LaserFocused OU",
+    "email": "justin@laserfocused.ee",
+    "url": "https://github.com/jclfocused"
+  },
+  "plugins": [
+    {
+      "name": "linear-planning-workflow",
+      "description": "MVP-focused feature planning and execution workflow for Linear. Plan features, create issues, update plans, and orchestrate work through Linear sub-issues.",
+      "version": "1.0.0",
+      "author": {
+        "name": "LaserFocused OU",
+        "email": "justin@laserfocused.ee"
+      },
+      "source": "./custom_plugins/plugins/linear-planning-workflow",
+      "category": "productivity",
+      "keywords": ["linear", "planning", "workflow", "mvp", "issues", "features"],
+      "license": "MIT"
+    },
+    {
+      "name": "jira-planning-workflow",
+      "description": "MVP-focused feature planning and execution workflow for Jira. Plan features as Stories with flat Subtasks, create issues, and orchestrate work.",
+      "version": "1.0.0",
+      "author": {
+        "name": "LaserFocused OU",
+        "email": "justin@laserfocused.ee"
+      },
+      "source": "./custom_plugins/plugins/jira-planning-workflow",
+      "category": "productivity",
+      "keywords": ["jira", "planning", "workflow", "mvp", "stories", "subtasks"],
+      "license": "MIT"
+    }
+  ]
+}

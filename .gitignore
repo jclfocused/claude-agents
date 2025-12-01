@@ -12,6 +12,12 @@
 !.gitignore
 !README.md
 
+# Plugin marketplace (for distribution)
+!.claude-plugin/
+!.claude-plugin/**
+!custom_plugins/
+!custom_plugins/**
+
 # Agent descriptions
 !*.md
 
