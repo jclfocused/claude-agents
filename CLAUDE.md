@@ -216,15 +216,6 @@ Every development plan MUST explicitly include:
 
 ## Available Commands
 
-### Specification Workflow Commands
-- **/createSteering** - Generate project steering documents (product, structure, tech guidelines)
-- **/createSpecReq** - Create requirements document for a feature specification
-- **/createSpecDesign** - Generate design document from requirements
-- **/createSpecTask** - Create implementation task list with TDD and quality gates
-- **/startSpecTask** - Execute the next pending task from a specification
-- **/describeSpec** - Display comprehensive guide for specification workflow
-- **/reviewProject** - Gather project context and execute custom prompts
-
 ### Development Commands
 - **/commit** - Create git commit with intelligent pre-commit hook resolution (never uses --no-verify)
 - **/runApp** - Build and run mobile app on simulator/emulator with auto-detection

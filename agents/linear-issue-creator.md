@@ -2,7 +2,7 @@
 name: linear-issue-creator
 description: Use this agent when you need to create a single Linear issue with proper codebase investigation and context. This agent researches the codebase, understands existing patterns, and creates a well-structured, actionable issue.
 tools: Bash, Glob, Grep, Read, Edit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, AskUserQuestion, Skill, SlashCommand, ListMcpResourcesTool, ReadMcpResourceTool, mcp__linear-server__list_comments, mcp__linear-server__create_comment, mcp__linear-server__list_cycles, mcp__linear-server__get_document, mcp__linear-server__list_documents, mcp__linear-server__get_issue, mcp__linear-server__list_issues, mcp__linear-server__create_issue, mcp__linear-server__update_issue, mcp__linear-server__list_issue_statuses, mcp__linear-server__get_issue_status, mcp__linear-server__list_issue_labels, mcp__linear-server__create_issue_label, mcp__linear-server__list_projects, mcp__linear-server__get_project, mcp__linear-server__create_project, mcp__linear-server__update_project, mcp__linear-server__list_project_labels, mcp__linear-server__list_teams, mcp__linear-server__get_team, mcp__linear-server__list_users, mcp__linear-server__get_user, mcp__linear-server__search_documentation
-model: sonnet
+model: opus
 color: blue
 ---
 
@@ -65,7 +65,11 @@ Keep investigation focused on what's needed for THIS issue:
    - Complex feature addition: More thorough (understand architecture, dependencies)
 
 ### Phase 4: Issue Creation
-1. Query teams if team information not provided
+1. **Team Selection**:
+   - Use `mcp__linear-server__list_teams` to get all available teams
+   - **If multiple teams exist**: ALWAYS use `AskUserQuestion` to ask the user which team to use for this issue
+   - **If only one team exists**: Use that team automatically
+   - Never assume which team to use when multiple options are available
 2. Determine project association:
    - If parent issue exists and has project: inherit that project
    - Otherwise: no project association

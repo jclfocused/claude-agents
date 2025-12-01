@@ -50,7 +50,10 @@ For each iteration:
 - Reference parent issue description for overall feature context
 - Update sub-issue description if needed to clarify
 
-**C. Execute Work**
+**C. Execute Work (SEQUENTIAL ONLY)**
+
+**CRITICAL: NEVER run execute-issue agents in parallel.** Always execute ONE sub-issue at a time. Parallel execution causes git conflicts, race conditions, and unpredictable behavior.
+
 Invoke the **execute-issue** agent with:
 - **Sub-Issue UUID**
 - **Parent Issue ID** (for easy parent issue lookup and context)
@@ -59,12 +62,32 @@ Invoke the **execute-issue** agent with:
 **D. Wait and Continue**
 - Wait for agent to complete
 - Refresh feature state (**ALWAYS filter issues by parentId** - never query globally)
-- Loop back to assess next sub-issue
+- Loop back to assess next sub-issue(s)
 
 ### 4. Completion
 Continue loop until:
 - No more Todo sub-issues remain, OR
 - User stops the process
+
+### 5. Final Code Review with Codex
+
+After ALL sub-issues are complete, run an automated code review using OpenAI Codex:
+
+```bash
+codex exec --model gpt-5.1-codex-max -c model_reasoning_effort=xhigh --yolo "Review all the changes on this branch compared to develop (git diff develop...HEAD). Provide a comprehensive code review noting any bugs, issues, or improvements. If you find issues that should be fixed, make the edits directly. Output a summary of your review and any changes made."
+```
+
+**Process:**
+1. Run the codex command after all sub-issues are complete
+2. Wait for Codex to complete its review (this may take a while with xhigh reasoning)
+3. If Codex makes any edits, review them briefly to ensure they align with the feature scope
+4. If Codex's changes are out of scope, revert them with `git checkout -- <file>`
+5. Commit any valid fixes Codex made with a message like "fix: address code review feedback"
+
+**Important:**
+- This step is MANDATORY before considering the feature complete
+- Run this ONCE at the end, not after each sub-issue
+- The review covers all changes across the entire feature branch
 
 ## Critical Principles
 
