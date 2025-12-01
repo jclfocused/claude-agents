@@ -7,5 +7,5 @@
     "email": "justin@laserfocused.ee"
   },
   "keywords": ["linear", "planning", "workflow", "mvp", "issues", "features"],
-  "mcpServers": "../.mcp.json"
+  "mcpServers": "./.mcp.json"
 }

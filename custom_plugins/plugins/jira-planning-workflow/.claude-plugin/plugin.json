@@ -7,5 +7,5 @@
     "email": "justin@laserfocused.ee"
   },
   "keywords": ["jira", "planning", "workflow", "mvp", "issues", "stories", "subtasks"],
-  "mcpServers": "../.mcp.json"
+  "mcpServers": "./.mcp.json"
 }
