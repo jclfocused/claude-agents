@@ -85,32 +85,31 @@ Output:
      - { label: "Yes, use Graphite", description: "Each issue becomes a stacked PR" }
      - { label: "No, use normal git", description: "All work on single branch" }
 
-4. If Using Graphite - Branch Setup (NEW)
+4. If Using Graphite - Trunk Setup (NEW)
 
-   Question 1: "What branch should we base off of?"
-   - header: "Base Branch"
+   **Key Insight**: Graphite recommends NOT creating empty branches. Each branch should have actual code changes. The stack of sub-issue branches IS the feature.
+
+   Question: "What branch should sub-issues stack on top of?"
+   - header: "Trunk Branch"
    - multiSelect: false
    - options:
-     - { label: "main", description: "Base off the main branch" }
-     - { label: "develop", description: "Base off the develop branch" }
-     - { label: "Current branch", description: "Base off your current branch" }
-
-   Question 2: "Branch name for this feature?"
-   - Generate default: "{prefix}-{number}-feat-{description}"
-   - header: "Feature Branch"
-   - multiSelect: false
-   - options:
-     - { label: "Use suggested: {default}", description: "Auto-generated from issue" }
-     - { label: "Let me specify", description: "I'll provide my own branch name" }
+     - { label: "develop", description: "Stack on develop (recommended)" }
+     - { label: "main", description: "Stack on main" }
+     - { label: "Current branch", description: "Stack on your current branch" }
 
    Execute:
    ```bash
    gt sync
-   gt checkout {base_branch}  # main, develop, or current
-   gt branch create {feature_branch_name}  # Creates empty branch as stack root
+   gt checkout {trunk_branch}  # develop, main, or current
+   # No feature branch created - first sub-issue will create its branch on trunk
    ```
 
-   **IMPORTANT**: Use `gt branch create` (not `git checkout -b`) so Graphite tracks the base branch. When there are no staged changes, Graphite creates an empty branch that serves as the stack root.
+   **Stack Structure**:
+   ```
+   {trunk} <- sub-issue-1 <- sub-issue-2 <- sub-issue-3
+   ```
+
+   The first sub-issue creates its branch directly on trunk. Subsequent sub-issues stack on top of each other. When PRs merge, they merge into trunk in order (bottom to top).
 
 5. Normal Branch Setup (existing flow - if not using Graphite)
    - Same as current implementation

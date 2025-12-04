@@ -46,6 +46,42 @@ If Graphite is available, use `AskUserQuestion`:
 
 ### 3. Git Branch Setup
 
+**IF using Graphite:**
+
+Graphite recommends NOT creating empty branches. In Graphite's model:
+- Each branch is an atomic changeset with actual code changes
+- The stack of sub-issue branches IS the feature
+- All branches stack on the trunk (develop/main) and merge into it in order
+
+Use `AskUserQuestion` to determine the trunk branch:
+
+**Question**: "What branch should sub-issues stack on top of?"
+- **header**: "Trunk Branch"
+- **multiSelect**: false
+- **options**:
+  - `{ label: "develop", description: "Stack on develop (recommended)" }`
+  - `{ label: "main", description: "Stack on main" }`
+  - `{ label: "Current branch", description: "Stack on your current branch" }`
+
+**Execute Graphite setup:**
+```bash
+# Sync Graphite first
+gt sync
+
+# Checkout the trunk branch - this is where all sub-issues will eventually merge
+gt checkout {trunk_branch}
+```
+
+**No separate feature branch is created.** The first sub-issue will create its branch directly on the trunk, and subsequent sub-issues stack on top of each other. The stack structure will be:
+
+```
+{trunk} <- sub-issue-1 <- sub-issue-2 <- sub-issue-3
+```
+
+When PRs merge, they merge into trunk in order (bottom to top). Graphite handles updating base branches automatically.
+
+**IF NOT using Graphite (normal flow):**
+
 Use `AskUserQuestion` to determine branch setup:
 
 **Question 1**: "Should we create a new branch for this feature work?"
@@ -85,24 +121,7 @@ Where:
 
 If user wants to specify their own name, use a follow-up `AskUserQuestion` with free text input.
 
-**Execute branch setup**:
-
-**IF using Graphite:**
-```bash
-# Sync Graphite first
-gt sync
-
-# Checkout the base branch (main, develop, or current)
-gt checkout {base_branch}
-
-# Create the feature branch using Graphite (creates empty branch if no changes)
-# This ensures Graphite tracks the base branch as the stack root
-gt branch create {feature_branch_name}
-```
-
-**IMPORTANT**: Use `gt branch create` (not `git checkout -b`) so Graphite tracks the base branch. When there are no staged changes, Graphite creates an empty branch that serves as the stack root. All subsequent sub-issue branches will stack on top of this.
-
-**IF NOT using Graphite (normal flow):**
+**Execute non-Graphite branch setup:**
 1. If creating a new branch:
    - Fetch latest from remote
    - Pull the selected base branch
