@@ -3,6 +3,8 @@
 
 # Except these files and directories
 !CLAUDE.md
+!docs/
+!docs/**
 !commands/
 !commands/**
 !agents/
