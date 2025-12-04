@@ -15,7 +15,6 @@ Apply this skill when:
 - Users complete work and might forget to update Jira
 - Unexpected scope or bugs are discovered during work
 - Checking on feature or work status
-- Users mention working on multiple things simultaneously
 
 ## Core Discipline Rules
 
@@ -27,37 +26,26 @@ Before any implementation work:
 2. Transition the issue to "In Progress"
 3. Only then begin writing code
 
-If no issue exists, create one first.
-
-### Rule 2: Transition Work Complete
+### Rule 2: Transition Work Complete Immediately
 **When work is done, immediately transition in Jira.**
 
-Upon completing any task:
 1. Commit the code changes
 2. Transition the Jira issue to "Done"
-3. Don't batch status updates - do it immediately
+3. Don't batch status updates
 
-### Rule 3: Track All Active Work
-**If working on multiple features, all relevant issues should be "In Progress".**
-
-Working on a Story AND a bug fix?
-- Both issues should be "In Progress"
-- Transition both when their respective work completes
-
-### Rule 4: Subtasks Are Mandatory
+### Rule 3: Subtasks Are Mandatory
 **A Story is NOT done until all Subtasks are done.**
 
 - Track progress at the Subtask level
 - Transition each Subtask to "Done" as completed
-- Parent Story stays open until all Subtasks are complete
+- Parent Story stays open until all Subtasks complete
 
-### Rule 5: Create Missing Scope
+### Rule 4: Create Missing Scope
 **If you discover work that needs doing but has no issue, create a Subtask first.**
 
-Unexpected situations:
-- Found a bug while implementing? Create a bug Subtask first
-- Need to refactor something? Create a REFACTOR Subtask first
-- Missing functionality discovered? Create a new Subtask first
+- Found a bug? Create a bug Subtask first
+- Need to refactor? Create a REFACTOR Subtask first
+- Missing functionality? Create a new Subtask first
 
 Always: Create Subtask → Transition "In Progress" → Do work → Transition "Done"
 
@@ -73,7 +61,7 @@ To Do → In Progress → Done
        Blocked → In Progress → Done
 ```
 
-Use `mcp__mcp-atlassian__jira_get_transitions` to see available transitions for an issue, then `mcp__mcp-atlassian__jira_transition_issue` to execute them.
+Use `mcp__mcp-atlassian__jira_get_transitions` to see available transitions, then `mcp__mcp-atlassian__jira_transition_issue` to execute them.
 
 ## Gentle Reminders
 
@@ -84,36 +72,7 @@ Use `mcp__mcp-atlassian__jira_get_transitions` to see available transitions for 
 > "Great work! Don't forget to transition the Jira issue to 'Done' to keep tracking accurate."
 
 ### When Unexpected Work Appears
-> "This looks like new scope that wasn't in the original Story. Let's create a Subtask for it before we implement it, so it's properly tracked."
-
-### When Discussing Multiple Tasks
-> "Since we're working on multiple things, let's make sure all the relevant Jira issues are transitioned to 'In Progress' so the team has visibility."
-
-## Subtask Naming Convention
-
-Since Jira Subtasks are flat (no nesting), use naming prefixes:
-- `SLICE 1: Main vertical slice`
-- `SLICE 1.1: Sub-part of slice 1`
-- `SLICE 2: Another vertical slice`
-- `REFACTOR: Cleanup task`
-- `TEST: Testing task`
-
-## Common Scenarios
-
-### Scenario: Quick Fix
-User: "Let me just quickly fix this bug..."
-
-Response: "Before making the fix, let's create a bug Subtask in Jira (or find the existing one) and transition it to 'In Progress'. This keeps our tracking accurate even for quick fixes."
-
-### Scenario: Scope Creep
-User: "While I'm in here, I should also refactor this..."
-
-Response: "Good catch on the refactoring need! Let's create a REFACTOR Subtask for that work first. That way it's tracked independently and we maintain clear scope on the original Subtask."
-
-### Scenario: Forgotten Update
-User: "I finished that feature yesterday."
-
-Response: "Nice! Is the Jira issue transitioned to 'Done'? Let's update it now if not, so the sprint status stays accurate."
+> "This looks like new scope. Let's create a Subtask for it before we implement it."
 
 ## Integration with Workflow
 
@@ -121,71 +80,5 @@ This discipline integrates with:
 - `/planFeature` - Creates properly structured Stories with Subtasks
 - `/work-on-feature` - Enforces status tracking during execution
 - `execute-issue-jira` agent - Automatically manages transitions
-
-The discipline rules are embedded in Story descriptions so any AI or developer working on Subtasks sees them.
-
-## Quick Reference Card
-
-```
-┌────────────────────────────────────────────────────────┐
-│              JIRA DISCIPLINE QUICK REFERENCE            │
-├────────────────────────────────────────────────────────┤
-│                                                         │
-│  BEFORE CODING:                                         │
-│    1. Find or create Jira issue                         │
-│    2. Transition issue to "In Progress"                 │
-│    3. Then start coding                                 │
-│                                                         │
-│  AFTER CODING:                                          │
-│    1. Commit changes                                    │
-│    2. Transition issue to "Done"                        │
-│    3. Don't batch updates                               │
-│                                                         │
-│  UNEXPECTED WORK:                                       │
-│    1. Stop coding                                       │
-│    2. Create Subtask first                              │
-│    3. Transition to "In Progress"                       │
-│    4. Then continue                                     │
-│                                                         │
-│  PARENT STORIES:                                        │
-│    → Not done until ALL Subtasks are done               │
-│                                                         │
-└────────────────────────────────────────────────────────┘
-```
-
-## Related Plugin Commands
-
-| Command/Agent | How It Enforces Discipline |
-|---------------|----------------------------|
-| `/planFeature` | Creates properly structured Stories with Subtasks |
-| `/work-on-feature` | Orchestrates work through Subtasks sequentially |
-| `execute-issue-jira` agent | Auto-transitions "In Progress" before work, "Done" after |
-| `jira-mvp-story-creator` | Embeds discipline rules in Story descriptions |
-
-## Example: Full Discipline Flow
-
-```
-User: "I want to add a dark mode toggle"
-
-✓ CORRECT FLOW:
-1. Check Jira for existing issue → None found
-2. Create Subtask: "SLICE 1: Add dark mode toggle"
-3. Transition Subtask to "In Progress"
-4. Implement feature
-5. Discover need for color token refactor
-6. STOP → Create Subtask "REFACTOR: Color tokens for theming"
-7. Transition refactor Subtask to "In Progress"
-8. Complete refactor → Transition to "Done"
-9. Continue dark mode → Complete → Transition to "Done"
-10. All Subtasks done → Parent Story can be transitioned to "Done"
-
-✗ WRONG FLOW:
-1. Start coding dark mode immediately
-2. Refactor colors "while in there"
-3. Finish everything
-4. Create issue after the fact
-5. Transition to "Done" immediately
-   → No tracking, no visibility, no traceability!
-```
 
 Remember: **Jira is the source of truth. Keep it accurate.**

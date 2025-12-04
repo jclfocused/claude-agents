@@ -41,15 +41,7 @@ For each requirement, ask: "If we had to ship tomorrow, would this be essential?
 - Polish = Defer until core is proven
 
 ### 4. Explicit Deferrals
-Always document what you're NOT doing:
-
-```
-## Deferred for Future Iterations
-- Advanced filtering options
-- Bulk operations
-- Export functionality
-- Admin configuration UI
-```
+Always document what you're NOT doing in a "Deferred" section.
 
 ## Guiding Questions
 
@@ -77,17 +69,6 @@ When scoping features, ask:
 - Comprehensive validation for internal tools
 - Beautiful UI for admin-only features
 
-## Example Conversations
-
-### User: "We need user authentication"
-**MVP Response**: "For MVP, let's focus on email/password login with basic JWT tokens. We can defer OAuth providers, password reset, and 2FA to future iterations once we validate the core auth flow works."
-
-### User: "Build a dashboard showing user metrics"
-**MVP Response**: "What's the single most important metric users need to see? Let's ship a dashboard with just that metric first, then add others based on what users actually request."
-
-### User: "We need a notification system"
-**MVP Response**: "What's the one notification users absolutely can't miss? Let's start with just that trigger and email delivery. We can add in-app notifications, preferences, and additional triggers after validating the core flow."
-
 ## Integration with Jira Workflow
 
 When this skill influences planning, the resulting Jira Stories should:
@@ -95,43 +76,5 @@ When this skill influences planning, the resulting Jira Stories should:
 - Include a "Deferred" section documenting what's out of scope
 - Focus on vertical slices that could ship independently
 - Subtasks should not include "nice to have" features
-
-## References
-
-### Foundational Reading
-- **The Lean Startup** by Eric Ries - The seminal work on MVP methodology and validated learning
-- **Getting Real** by 37signals (Basecamp) - Practical guide to building less and shipping faster
-
-### Key Concepts
-- **Build-Measure-Learn**: Ship something small, measure real usage, learn, iterate
-- **Validated Learning**: Use MVPs to test assumptions before investing heavily
-- **Pivot or Persevere**: MVP results inform whether to change direction or double down
-
-### Related Plugin Commands
-- `/planFeature` - Creates MVP-scoped Jira Stories automatically
-- `jira-mvp-story-creator` agent - Enforces MVP thinking during Story creation
-
-### The MVP Mindset in Practice
-
-```
-Feature Request: "Build a complete e-commerce platform"
-
-Full Scope (Don't do this):
-├── Product catalog with advanced filtering
-├── Shopping cart with saved items
-├── Multiple payment providers
-├── Order management dashboard
-├── Inventory management
-├── Reviews and ratings
-├── Wishlists
-└── Recommendation engine
-
-MVP Scope (Do this):
-├── SLICE 1: Display product list from API
-├── SLICE 2: Add to cart and checkout with Stripe
-└── SLICE 3: Order confirmation email
-
-Deferred: Everything else until core purchase flow is proven
-```
 
 Remember: **"Ship the minimum that works."**

@@ -15,7 +15,6 @@ Apply this skill when:
 - Users complete work and might forget to update Linear
 - Unexpected scope or bugs are discovered during work
 - Checking on feature or work status
-- Users mention working on multiple things simultaneously
 
 ## Core Discipline Rules
 
@@ -27,37 +26,26 @@ Before any implementation work:
 2. Mark the issue as "In Progress"
 3. Only then begin writing code
 
-If no issue exists, create one first.
-
-### Rule 2: Mark Work Complete
+### Rule 2: Mark Work Complete Immediately
 **When work is done, immediately update Linear.**
 
-Upon completing any task:
 1. Commit the code changes
 2. Mark the Linear issue as "Done"
-3. Don't batch status updates - do it immediately
+3. Don't batch status updates
 
-### Rule 3: Track All Active Work
-**If working on multiple features, all relevant issues should be "In Progress".**
-
-Working on authentication AND a bug fix?
-- Both issues should be "In Progress"
-- Update both when their respective work completes
-
-### Rule 4: Sub-Issues Are Mandatory
+### Rule 3: Sub-Issues Are Mandatory
 **A parent issue is NOT done until all sub-issues are done.**
 
 - Track progress at the sub-issue level
 - Mark each sub-issue "Done" as completed
-- Parent issue stays open until all children are complete
+- Parent issue stays open until all children complete
 
-### Rule 5: Create Missing Scope
+### Rule 4: Create Missing Scope
 **If you discover work that needs doing but has no issue, create one first.**
 
-Unexpected situations:
-- Found a bug while implementing? Create a bug issue first
-- Need to refactor something? Create a refactor issue first
-- Missing functionality discovered? Create a sub-issue first
+- Found a bug? Create a bug issue first
+- Need to refactor? Create a refactor issue first
+- Missing functionality? Create a sub-issue first
 
 Always: Create issue → Mark "In Progress" → Do work → Mark "Done"
 
@@ -70,10 +58,7 @@ Always: Create issue → Mark "In Progress" → Do work → Mark "Done"
 > "Great work! Don't forget to mark the Linear issue as 'Done' to keep tracking accurate."
 
 ### When Unexpected Work Appears
-> "This looks like new scope that wasn't in the original issue. Let's create a sub-issue for it before we implement it, so it's properly tracked."
-
-### When Discussing Multiple Tasks
-> "Since we're working on multiple things, let's make sure all the relevant Linear issues are marked 'In Progress' so the team has visibility."
+> "This looks like new scope. Let's create a sub-issue for it before we implement it, so it's properly tracked."
 
 ## Status Flow
 
@@ -85,94 +70,11 @@ Todo → In Progress → Done
       Blocked → In Progress → Done
 ```
 
-## Common Scenarios
-
-### Scenario: Quick Fix
-User: "Let me just quickly fix this bug..."
-
-Response: "Before making the fix, let's create a bug issue in Linear (or find the existing one) and mark it 'In Progress'. This keeps our tracking accurate even for quick fixes."
-
-### Scenario: Scope Creep
-User: "While I'm in here, I should also refactor this..."
-
-Response: "Good catch on the refactoring need! Let's create a separate sub-issue for that refactor work first. That way it's tracked independently and we maintain clear scope on the original issue."
-
-### Scenario: Forgotten Update
-User: "I finished that feature yesterday."
-
-Response: "Nice! Is the Linear issue marked as 'Done'? Let's update it now if not, so the project status stays accurate."
-
 ## Integration with Workflow
 
 This discipline integrates with:
 - `/planFeature` - Creates properly structured issues
 - `/work-on-feature` - Enforces status tracking during execution
 - `execute-issue` agent - Automatically manages status transitions
-
-The discipline rules are embedded in parent issue descriptions so any AI or developer working on sub-issues sees them.
-
-## Quick Reference Card
-
-```
-┌────────────────────────────────────────────────────────┐
-│              LINEAR DISCIPLINE QUICK REFERENCE          │
-├────────────────────────────────────────────────────────┤
-│                                                         │
-│  BEFORE CODING:                                         │
-│    1. Find or create Linear issue                       │
-│    2. Mark issue "In Progress"                          │
-│    3. Then start coding                                 │
-│                                                         │
-│  AFTER CODING:                                          │
-│    1. Commit changes                                    │
-│    2. Mark issue "Done"                                 │
-│    3. Don't batch updates                               │
-│                                                         │
-│  UNEXPECTED WORK:                                       │
-│    1. Stop coding                                       │
-│    2. Create sub-issue first                            │
-│    3. Mark "In Progress"                                │
-│    4. Then continue                                     │
-│                                                         │
-│  PARENT ISSUES:                                         │
-│    → Not done until ALL sub-issues are done             │
-│                                                         │
-└────────────────────────────────────────────────────────┘
-```
-
-## Related Plugin Commands
-
-| Command/Agent | How It Enforces Discipline |
-|---------------|----------------------------|
-| `/planFeature` | Creates properly structured issues upfront |
-| `/work-on-feature` | Orchestrates work through issues sequentially |
-| `execute-issue` agent | Auto-marks "In Progress" before work, "Done" after |
-| `linear-mvp-project-creator` | Embeds discipline rules in parent issue descriptions |
-
-## Example: Full Discipline Flow
-
-```
-User: "I want to add a dark mode toggle"
-
-✓ CORRECT FLOW:
-1. Check Linear for existing issue → None found
-2. Create issue: "Add dark mode toggle"
-3. Mark issue "In Progress"
-4. Implement feature
-5. Discover need for color token refactor
-6. STOP → Create sub-issue "Refactor color tokens for theming"
-7. Mark refactor issue "In Progress"
-8. Complete refactor → Mark "Done"
-9. Continue dark mode → Complete → Mark "Done"
-10. All sub-issues done → Parent can be marked "Done"
-
-✗ WRONG FLOW:
-1. Start coding dark mode immediately
-2. Refactor colors "while in there"
-3. Finish everything
-4. Create issue after the fact
-5. Mark as "Done" immediately
-   → No tracking, no visibility, no traceability!
-```
 
 Remember: **Linear is the source of truth. Keep it accurate.**
