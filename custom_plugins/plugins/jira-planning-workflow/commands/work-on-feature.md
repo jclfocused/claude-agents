@@ -91,12 +91,15 @@ If user wants to specify their own name, use a follow-up `AskUserQuestion` with 
 # Sync Graphite first
 gt sync
 
-# Checkout the base branch
-gt checkout {base_branch}  # main, develop, or current
+# Checkout the base branch (main, develop, or current)
+gt checkout {base_branch}
 
-# Create the feature branch (regular git for the base)
-git checkout -b {feature_branch_name}
+# Create the feature branch using Graphite (creates empty branch if no changes)
+# This ensures Graphite tracks the base branch as the stack root
+gt branch create {feature_branch_name}
 ```
+
+**IMPORTANT**: Use `gt branch create` (not `git checkout -b`) so Graphite tracks the base branch. When there are no staged changes, Graphite creates an empty branch that serves as the stack root. All subsequent Subtask branches will stack on top of this.
 
 **IF NOT using Graphite (normal flow):**
 1. If creating a new branch:

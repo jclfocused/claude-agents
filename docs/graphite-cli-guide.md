@@ -633,6 +633,19 @@ gt create --all --message "commit message"  # Stage all, set message
 gt create -a -m "commit message"            # Short form
 gt create --insert                          # Insert branch mid-stack
 gt create feature-name                      # Specify branch name
+gt branch create feature-name               # Create empty branch (no changes)
+```
+
+**Creating Empty Branches (Stack Roots)**:
+When you run `gt create` or `gt branch create` with **no staged changes**, Graphite creates an empty branch. This is useful for:
+- Creating a feature base branch that serves as the stack root
+- Setting up a branch structure before writing code
+
+```bash
+# Create an empty base branch for a feature stack
+gt checkout develop
+gt branch create wha-123-feat-user-auth  # Creates empty branch, Graphite tracks it
+# Now all subsequent gt create calls will stack on top of this
 ```
 
 #### `gt submit` Options

@@ -107,8 +107,10 @@ Output:
    ```bash
    gt sync
    gt checkout {base_branch}  # main, develop, or current
-   git checkout -b {feature_branch_name}
+   gt branch create {feature_branch_name}  # Creates empty branch as stack root
    ```
+
+   **IMPORTANT**: Use `gt branch create` (not `git checkout -b`) so Graphite tracks the base branch. When there are no staged changes, Graphite creates an empty branch that serves as the stack root.
 
 5. Normal Branch Setup (existing flow - if not using Graphite)
    - Same as current implementation
