@@ -226,4 +226,67 @@ Investigation phase should identify:
 - Missing components to create
 - Components needing extension
 
+## References
+
+### Foundational Reading
+- **Atomic Design** by Brad Frost (https://atomicdesign.bradfrost.com/) - The definitive guide to this methodology
+- **Design Systems** by Alla Kholmatova - Building and scaling component libraries
+- **Refactoring UI** by Adam Wathan & Steve Schoger - Practical component design patterns
+
+### Brad Frost's Chemistry Metaphor
+
+The naming comes from chemistry:
+```
+Atoms    → Hydrogen, Oxygen       → Basic UI elements (Button, Input)
+Molecules → H₂O                   → Simple compounds (FormField = Label + Input + Error)
+Organisms → Cells                 → Complex structures (LoginForm, Header)
+Templates → Organ systems         → Page layouts without real content
+Pages     → Complete organisms    → Templates with actual data
+```
+
+### Component Checklist Before Creating
+
+```
+h2. Pre-Creation Checklist
+
+* [ ] Searched atoms/ directory for similar component
+* [ ] Searched molecules/ directory for similar component
+* [ ] Searched organisms/ directory for similar component
+* [ ] Confirmed no existing component can be extended via props
+* [ ] Determined correct level (atom/molecule/organism)
+* [ ] Will be reused in 2+ places (justifies extraction)
+* [ ] Named following existing project conventions
+```
+
+### Real Example: Building a Comment Feature
+
+```
+Existing atoms to REUSE (don't recreate!):
+├── Avatar        → Use with size="sm" prop
+├── Button        → Use with variant="primary" prop
+├── TextArea      → Use with placeholder prop
+└── Timestamp     → Use with relative={true} prop
+
+New molecule to CREATE:
+└── CommentInput
+    ├── Uses: Avatar + TextArea + Button
+    └── Props: onSubmit, placeholder, user
+
+New organism to CREATE:
+└── CommentThread
+    ├── Uses: CommentInput + list of Comment molecules
+    └── Props: comments[], onAddComment, currentUser
+
+DO NOT CREATE (anti-patterns):
+├── CommentAvatar     → Just use Avatar with props!
+├── CommentButton     → Just use Button with props!
+├── CommentTextArea   → Just use TextArea with props!
+└── CommentTimestamp  → Just use Timestamp with props!
+```
+
+### Related Plugin Workflow
+- `jira-mvp-story-creator` agent - Identifies existing components during investigation phase
+- Investigation phase maps atoms → molecules → organisms before planning new work
+- UI Subtasks specify component type and whether to create or reuse
+
 Remember: **Reuse existing components. Only create what's truly missing.**

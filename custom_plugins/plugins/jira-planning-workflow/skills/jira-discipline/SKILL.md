@@ -124,4 +124,68 @@ This discipline integrates with:
 
 The discipline rules are embedded in Story descriptions so any AI or developer working on Subtasks sees them.
 
+## Quick Reference Card
+
+```
+┌────────────────────────────────────────────────────────┐
+│              JIRA DISCIPLINE QUICK REFERENCE            │
+├────────────────────────────────────────────────────────┤
+│                                                         │
+│  BEFORE CODING:                                         │
+│    1. Find or create Jira issue                         │
+│    2. Transition issue to "In Progress"                 │
+│    3. Then start coding                                 │
+│                                                         │
+│  AFTER CODING:                                          │
+│    1. Commit changes                                    │
+│    2. Transition issue to "Done"                        │
+│    3. Don't batch updates                               │
+│                                                         │
+│  UNEXPECTED WORK:                                       │
+│    1. Stop coding                                       │
+│    2. Create Subtask first                              │
+│    3. Transition to "In Progress"                       │
+│    4. Then continue                                     │
+│                                                         │
+│  PARENT STORIES:                                        │
+│    → Not done until ALL Subtasks are done               │
+│                                                         │
+└────────────────────────────────────────────────────────┘
+```
+
+## Related Plugin Commands
+
+| Command/Agent | How It Enforces Discipline |
+|---------------|----------------------------|
+| `/planFeature` | Creates properly structured Stories with Subtasks |
+| `/work-on-feature` | Orchestrates work through Subtasks sequentially |
+| `execute-issue-jira` agent | Auto-transitions "In Progress" before work, "Done" after |
+| `jira-mvp-story-creator` | Embeds discipline rules in Story descriptions |
+
+## Example: Full Discipline Flow
+
+```
+User: "I want to add a dark mode toggle"
+
+✓ CORRECT FLOW:
+1. Check Jira for existing issue → None found
+2. Create Subtask: "SLICE 1: Add dark mode toggle"
+3. Transition Subtask to "In Progress"
+4. Implement feature
+5. Discover need for color token refactor
+6. STOP → Create Subtask "REFACTOR: Color tokens for theming"
+7. Transition refactor Subtask to "In Progress"
+8. Complete refactor → Transition to "Done"
+9. Continue dark mode → Complete → Transition to "Done"
+10. All Subtasks done → Parent Story can be transitioned to "Done"
+
+✗ WRONG FLOW:
+1. Start coding dark mode immediately
+2. Refactor colors "while in there"
+3. Finish everything
+4. Create issue after the fact
+5. Transition to "Done" immediately
+   → No tracking, no visibility, no traceability!
+```
+
 Remember: **Jira is the source of truth. Keep it accurate.**

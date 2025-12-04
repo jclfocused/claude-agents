@@ -96,4 +96,42 @@ When this skill influences planning, the resulting Jira Stories should:
 - Focus on vertical slices that could ship independently
 - Subtasks should not include "nice to have" features
 
+## References
+
+### Foundational Reading
+- **The Lean Startup** by Eric Ries - The seminal work on MVP methodology and validated learning
+- **Getting Real** by 37signals (Basecamp) - Practical guide to building less and shipping faster
+
+### Key Concepts
+- **Build-Measure-Learn**: Ship something small, measure real usage, learn, iterate
+- **Validated Learning**: Use MVPs to test assumptions before investing heavily
+- **Pivot or Persevere**: MVP results inform whether to change direction or double down
+
+### Related Plugin Commands
+- `/planFeature` - Creates MVP-scoped Jira Stories automatically
+- `jira-mvp-story-creator` agent - Enforces MVP thinking during Story creation
+
+### The MVP Mindset in Practice
+
+```
+Feature Request: "Build a complete e-commerce platform"
+
+Full Scope (Don't do this):
+├── Product catalog with advanced filtering
+├── Shopping cart with saved items
+├── Multiple payment providers
+├── Order management dashboard
+├── Inventory management
+├── Reviews and ratings
+├── Wishlists
+└── Recommendation engine
+
+MVP Scope (Do this):
+├── SLICE 1: Display product list from API
+├── SLICE 2: Add to cart and checkout with Stripe
+└── SLICE 3: Order confirmation email
+
+Deferred: Everything else until core purchase flow is proven
+```
+
 Remember: **"Ship the minimum that works."**

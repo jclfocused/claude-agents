@@ -187,4 +187,85 @@ Refactor [component/area] to [improvement].
 - **Hidden dependencies**: Not mentioning blockers
 - **Scope creep in description**: Adding "nice to haves"
 
+## Real-World Issue Example
+
+### Parent Feature Issue (Created by `/planFeature`)
+
+```markdown
+## IMPORTANT: Linear Issue Discipline
+
+All development work must be tracked through Linear issues.
+- Before starting work: Mark issue "In Progress"
+- Upon completion: Mark issue "Done"
+- Missing scope: Create sub-issue first, then proceed
+
+A parent issue is NOT done until all sub-issues are done.
+
+---
+
+## Problem
+Users cannot reset their password if they forget it, leading to
+support tickets and account abandonment.
+
+## Solution
+Implement a password reset flow via email with secure token validation.
+
+## High-Level Implementation
+- Use existing email service (SendGrid integration)
+- JWT tokens with 1-hour expiry for reset links
+- Rate limiting: max 3 reset requests per hour per email
+
+## Codebase Investigation Findings
+- Auth patterns: src/services/auth/ - follow AuthService pattern
+- Email templates: src/templates/email/ - use BaseEmailTemplate
+- Similar feature: Email verification flow in src/features/verify/
+
+## Out of Scope / Deferred
+- SMS-based reset (future iteration)
+- Security questions (not planned)
+- Admin password reset capability (separate feature)
+```
+
+### Sub-Issue (Vertical Slice)
+
+```markdown
+## Objective
+Create the "Forgot Password" form that captures user email and
+triggers the reset email.
+
+## Acceptance Criteria
+- [ ] Form displays email input with validation
+- [ ] Submit button disabled until valid email entered
+- [ ] Success state shows "Check your email" message
+- [ ] Error state shows message if email not found (generic for security)
+- [ ] Loading state shown during API call
+- [ ] Rate limit error displayed if exceeded
+
+## Implementation Notes
+- Relevant files: src/features/auth/components/
+- Pattern to follow: LoginForm component structure
+- API endpoint: POST /api/auth/forgot-password (to be created in SLICE 2)
+- Use existing Button, Input, FormField atoms/molecules
+
+## Context
+Parent: [Password Reset Feature]
+Related: [SLICE 2: Create reset email API endpoint]
+```
+
+## References
+
+### Related Plugin Workflow
+- `/planFeature` command - Auto-generates parent issues with this structure
+- `linear-mvp-project-creator` agent - Creates sub-issues with proper templates
+- `execute-issue` agent - Uses acceptance criteria to verify completeness
+
+### Writing Quality Checklist
+```
+□ Could a new team member understand this without context?
+□ Are acceptance criteria specific and testable?
+□ Is the scope clear (what's included AND excluded)?
+□ Are dependencies and related issues linked?
+□ Are relevant code locations referenced?
+```
+
 Remember: **A good issue can be executed by anyone who reads it.**

@@ -111,4 +111,68 @@ This discipline integrates with:
 
 The discipline rules are embedded in parent issue descriptions so any AI or developer working on sub-issues sees them.
 
+## Quick Reference Card
+
+```
+┌────────────────────────────────────────────────────────┐
+│              LINEAR DISCIPLINE QUICK REFERENCE          │
+├────────────────────────────────────────────────────────┤
+│                                                         │
+│  BEFORE CODING:                                         │
+│    1. Find or create Linear issue                       │
+│    2. Mark issue "In Progress"                          │
+│    3. Then start coding                                 │
+│                                                         │
+│  AFTER CODING:                                          │
+│    1. Commit changes                                    │
+│    2. Mark issue "Done"                                 │
+│    3. Don't batch updates                               │
+│                                                         │
+│  UNEXPECTED WORK:                                       │
+│    1. Stop coding                                       │
+│    2. Create sub-issue first                            │
+│    3. Mark "In Progress"                                │
+│    4. Then continue                                     │
+│                                                         │
+│  PARENT ISSUES:                                         │
+│    → Not done until ALL sub-issues are done             │
+│                                                         │
+└────────────────────────────────────────────────────────┘
+```
+
+## Related Plugin Commands
+
+| Command/Agent | How It Enforces Discipline |
+|---------------|----------------------------|
+| `/planFeature` | Creates properly structured issues upfront |
+| `/work-on-feature` | Orchestrates work through issues sequentially |
+| `execute-issue` agent | Auto-marks "In Progress" before work, "Done" after |
+| `linear-mvp-project-creator` | Embeds discipline rules in parent issue descriptions |
+
+## Example: Full Discipline Flow
+
+```
+User: "I want to add a dark mode toggle"
+
+✓ CORRECT FLOW:
+1. Check Linear for existing issue → None found
+2. Create issue: "Add dark mode toggle"
+3. Mark issue "In Progress"
+4. Implement feature
+5. Discover need for color token refactor
+6. STOP → Create sub-issue "Refactor color tokens for theming"
+7. Mark refactor issue "In Progress"
+8. Complete refactor → Mark "Done"
+9. Continue dark mode → Complete → Mark "Done"
+10. All sub-issues done → Parent can be marked "Done"
+
+✗ WRONG FLOW:
+1. Start coding dark mode immediately
+2. Refactor colors "while in there"
+3. Finish everything
+4. Create issue after the fact
+5. Mark as "Done" immediately
+   → No tracking, no visibility, no traceability!
+```
+
 Remember: **Linear is the source of truth. Keep it accurate.**

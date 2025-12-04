@@ -185,4 +185,56 @@ Each slice should be:
 - Independently testable
 - Adds user value (even if small)
 
+## References
+
+### Foundational Reading
+- **Agile Software Development** by Alistair Cockburn - Original source for vertical slice concept
+- **User Stories Applied** by Mike Cohn - INVEST criteria for story sizing
+- **Continuous Delivery** by Jez Humble & David Farley - Why vertical slices enable continuous deployment
+
+### INVEST Criteria for Good Slices
+
+Each vertical slice should be:
+- **I**ndependent - Can be developed without other slices
+- **N**egotiable - Details can be discussed, not a contract
+- **V**aluable - Delivers value to end user
+- **E**stimable - Can reasonably estimate effort
+- **S**mall - Fits in a single sprint/iteration
+- **T**estable - Clear criteria for "done"
+
+### Related Plugin Commands
+- `/planFeature` - Creates Subtasks organized as vertical slices
+- `jira-mvp-story-creator` agent - Structures Subtasks with SLICE prefixes
+
+### Real-World Slice Example: User Profile Feature
+
+```
+❌ Horizontal (Anti-Pattern):
+1. Create User model with all fields
+2. Create UserService with all methods
+3. Create all API endpoints (GET, PUT, POST, DELETE)
+4. Create ProfilePage, ProfileForm, AvatarUpload components
+5. Wire everything together
+   → Nothing works until step 5 is complete!
+
+✓ Vertical (Correct) - As Jira Subtasks:
+SLICE 1: View basic profile
+  └── GET /profile → ProfilePage (name, email display only)
+  └── Can ship and get feedback immediately
+
+SLICE 2: Edit profile name
+  └── PUT /profile → ProfileForm (just name field)
+  └── Save button works, users can update names
+
+SLICE 3: Upload avatar
+  └── POST /profile/avatar → AvatarUpload component
+  └── Users can personalize their profile
+
+SLICE 4: Change email with verification
+  └── Complex flow, deferred until basic profile proven
+  └── Build this after validating simpler flows work
+```
+
+Each Subtask is independently deployable, testable, and valuable.
+
 Remember: **Ship working software frequently. Slices make this possible.**
