@@ -92,6 +92,26 @@ The plugin includes an MCP server configuration for Linear that will be automati
    ```
    Get your API key from: https://linear.app/settings/api
 
+## Skills
+
+Skills are model-invoked capabilities that Claude uses autonomously based on context. Unlike slash commands (user-invoked), skills activate automatically when relevant.
+
+| Skill | Description |
+|-------|-------------|
+| `mvp-scoping` | Guides MVP thinking during feature discussions - "what's the minimum to make this work?" |
+| `linear-discipline` | Reminds about Linear issue tracking discipline - having issues in progress, marking done, creating missing scope |
+| `issue-writing` | Ensures consistent, high-quality issue structure with clear acceptance criteria |
+| `vertical-slice-planning` | Guides decomposition into vertical slices (end-to-end functionality) vs horizontal layers |
+| `atomic-design-planning` | Guides UI component architecture using atoms, molecules, organisms methodology |
+
+### When Skills Activate
+
+- **mvp-scoping**: When discussing features, planning work, or scoping requirements
+- **linear-discipline**: When starting/completing work, or discussing implementation without mentioning a Linear issue
+- **issue-writing**: When drafting issues or defining acceptance criteria
+- **vertical-slice-planning**: When breaking down features or discussing PR structure
+- **atomic-design-planning**: When discussing UI components or frontend implementation
+
 ## Troubleshooting
 
 ### MCP Server Not Accessible
