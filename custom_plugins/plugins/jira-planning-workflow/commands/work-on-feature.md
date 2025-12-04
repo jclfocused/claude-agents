@@ -142,8 +142,8 @@ Invoke the **jira-planning-workflow:execute-issue-jira-graphite** agent with:
 
 **After agent completes, orchestrator runs:**
 ```bash
-# Submit the current stack state (makes PR visible for review)
-gt submit --no-interactive
+# Submit the current stack state (makes PR visible for review, NOT as draft)
+gt submit --no-interactive --publish
 
 # Sync to ensure everything is up to date
 gt sync
@@ -160,7 +160,7 @@ Invoke the **jira-planning-workflow:execute-issue-jira** agent with:
 
 **D. Wait and Continue**
 - Wait for agent to complete
-- If using Graphite: run `gt submit --no-interactive` and `gt sync`
+- If using Graphite: run `gt submit --no-interactive --publish` and `gt sync`
 - Refresh feature state (query Subtasks again via jira-story-context or direct JQL)
 - Loop back to assess next Subtask
 
@@ -175,7 +175,7 @@ Continue loop until:
 After all Subtasks are complete:
 ```bash
 # Final submission to ensure all PRs are up
-gt submit --stack --no-interactive
+gt submit --stack --no-interactive --publish
 ```
 
 Report to user:

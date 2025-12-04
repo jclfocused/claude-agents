@@ -128,7 +128,7 @@ Output:
      - Agent returns success
 
      ORCHESTRATOR after each issue:
-     - gt submit --no-interactive
+     - gt submit --no-interactive --publish
      - gt sync
      - (User can now review PR while next issue is worked on)
 
@@ -139,7 +139,7 @@ Output:
 7. Completion
 
    IF using Graphite:
-     - gt submit --stack --no-interactive (final ensure all submitted)
+     - gt submit --stack --no-interactive --publish (final ensure all submitted)
      - Report stack PR URLs
      - Remind: "Issues are 'In Review'. Graphite marks 'Done' when PRs merge."
 
@@ -281,11 +281,11 @@ gt sync
 gt checkout {base_branch}
 
 # After each issue completes
-gt submit --no-interactive
+gt submit --no-interactive --publish
 gt sync
 
 # Final submission
-gt submit --stack --no-interactive
+gt submit --stack --no-interactive --publish
 ```
 
 ---

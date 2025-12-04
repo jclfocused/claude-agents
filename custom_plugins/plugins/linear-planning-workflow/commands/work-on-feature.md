@@ -143,14 +143,16 @@ Invoke the **linear-planning-workflow:execute-issue-graphite** agent with:
 
 **After agent completes, orchestrator runs:**
 ```bash
-# Submit the current stack state (makes PR visible for review)
-gt submit --no-interactive
+# Submit the current stack state (makes PR visible for review, NOT as draft)
+gt submit --no-interactive --publish
 
 # Sync to ensure everything is up to date
 gt sync
 ```
 
 This allows reviewers to start reviewing earlier PRs while work continues on later ones.
+
+**IMPORTANT**: Always use `--publish` flag with `--no-interactive`, otherwise PRs are created as drafts by default.
 
 **IF NOT using Graphite (normal flow):**
 
@@ -161,7 +163,7 @@ Invoke the **linear-planning-workflow:execute-issue** agent with:
 
 **D. Wait and Continue**
 - Wait for agent to complete
-- If using Graphite: run `gt submit --no-interactive` and `gt sync`
+- If using Graphite: run `gt submit --no-interactive --publish` and `gt sync`
 - Refresh feature state (**ALWAYS filter issues by parentId** - never query globally)
 - Loop back to assess next sub-issue(s)
 
@@ -176,7 +178,7 @@ Continue loop until:
 After all sub-issues are complete:
 ```bash
 # Final submission to ensure all PRs are up
-gt submit --stack --no-interactive
+gt submit --stack --no-interactive --publish
 ```
 
 Report to user:
