@@ -28,20 +28,35 @@ $ARGUMENTS
 - If the `jira-story-context` agent cannot find the parent Story or returns an error, **STOP IMMEDIATELY** and ask the user for clarification
 - Extract and store the **Story key** from the sub-agent's response for use in subsequent steps
 
-### 2. Check Graphite Availability
+### 2. Determine Version Control Workflow
 
-**Detect if Graphite MCP is available** by checking if `mcp__graphite__run_gt_cmd` tool exists.
+**Step 1: Check if git is initialized**
 
-If Graphite is available, use `AskUserQuestion`:
+Run `git status` to check if the current directory is a git repository.
 
-**Question**: "Graphite is available. Would you like to use stacked PRs for this feature?"
+**If NOT a git repository:**
+1. Run `git init`
+2. Set default branch to main: `git branch -M main`
+3. Inform user: "Initialized git repository with main branch"
+4. Proceed with normal git workflow (Graphite requires existing repo)
+
+**Step 2: Check Graphite availability (only if git is already initialized)**
+
+Check if `mcp__graphite__run_gt_cmd` tool exists in your available tools.
+
+**IF Graphite tool exists**, ask the user:
+
+Use `AskUserQuestion`:
+- **Question**: "Graphite is available. Would you like to use stacked PRs for this feature?"
 - **header**: "Graphite Stacking"
 - **multiSelect**: false
 - **options**:
   - `{ label: "Yes, use Graphite", description: "Each Subtask becomes a stacked PR for parallel reviews" }`
   - `{ label: "No, use normal git", description: "All work committed to a single feature branch" }`
 
-**Store the user's choice** - this determines which agent and workflow to use.
+**IF Graphite tool does NOT exist**, silently proceed with normal git workflow. Do NOT mention Graphite to the user.
+
+**Store the workflow choice** - this determines which agent to use later.
 
 ### 3. Git Branch Setup
 
