@@ -28,6 +28,16 @@ $ARGUMENTS
 - If the `jira-story-context` agent cannot find the parent Story or returns an error, **STOP IMMEDIATELY** and ask the user for clarification
 - Extract and store the **Story key** from the sub-agent's response for use in subsequent steps
 
+**IMPORTANT: Transition Parent Story to In Progress**
+
+After successfully retrieving the parent Story, **immediately transition it to "In Progress"**:
+
+1. First, get available transitions: `mcp__mcp-atlassian__jira_get_transitions({ issue_key: "{story_key}" })`
+2. Find the transition ID for "In Progress" (or similar status like "Start Progress")
+3. Execute the transition: `mcp__mcp-atlassian__jira_transition_issue({ issue_key: "{story_key}", transition_id: "{transition_id}" })`
+
+This signals that work on the feature has begun. Do NOT skip this step.
+
 ### 2. Determine Version Control Workflow
 
 **Step 1: Check if git is initialized**
@@ -204,6 +214,16 @@ Continue loop until:
 - No more To Do/Open Subtasks remain, OR
 - User stops the process
 
+**IMPORTANT: Transition Parent Story to Done**
+
+When all Subtasks are complete, **transition the parent Story to "Done"**:
+
+1. Get available transitions: `mcp__mcp-atlassian__jira_get_transitions({ issue_key: "{story_key}" })`
+2. Find the transition ID for "Done" (or similar status like "Resolve", "Complete")
+3. Execute the transition: `mcp__mcp-atlassian__jira_transition_issue({ issue_key: "{story_key}", transition_id: "{transition_id}" })`
+
+Do NOT forget this step - the parent Story must be marked Done when the feature is complete.
+
 **IF using Graphite:**
 
 After all Subtasks are complete:
@@ -218,6 +238,7 @@ Report to user:
 
 All Subtasks have been implemented as stacked PRs.
 
+**Parent Story:** {story_key} marked as Done
 **Stack PRs:** [List the branch names / PR URLs if available]
 
 **Status:** All Subtasks are marked "In Review"
@@ -225,14 +246,13 @@ All Subtasks have been implemented as stacked PRs.
 **Next Steps:**
 1. Review the stacked PRs in order
 2. Approve and merge from bottom to top
-3. Graphite will automatically transition Jira issues when PRs merge
 
 Use `gt log` to see the full stack structure.
 ```
 
 **IF NOT using Graphite:**
 
-Normal completion message with summary of work done.
+After marking parent Story Done, report completion with summary of work done.
 
 ## Critical Principles
 

@@ -29,6 +29,19 @@ $ARGUMENTS
 - Extract and store the **parent issue UUID** from the sub-agent's response for use in subsequent steps
 - Also extract the **issue identifier** (e.g., "LIN-123") for branch naming
 
+**IMPORTANT: Mark Parent Issue In Progress**
+
+After successfully retrieving the parent feature issue, **immediately transition it to "In Progress"** using `mcp__linear-server__update_issue`:
+
+```
+mcp__linear-server__update_issue({
+  id: "{parent_issue_uuid}",
+  state: "In Progress"
+})
+```
+
+This signals that work on the feature has begun. Do NOT skip this step.
+
 ### 2. Determine Version Control Workflow
 
 **Step 1: Check if git is initialized**
@@ -207,6 +220,19 @@ Continue loop until:
 - No more Todo sub-issues remain, OR
 - User stops the process
 
+**IMPORTANT: Mark Parent Issue Done**
+
+When all sub-issues are complete, **transition the parent feature issue to "Done"** using `mcp__linear-server__update_issue`:
+
+```
+mcp__linear-server__update_issue({
+  id: "{parent_issue_uuid}",
+  state: "Done"
+})
+```
+
+Do NOT forget this step - the parent issue must be marked Done when the feature is complete.
+
 **IF using Graphite:**
 
 After all sub-issues are complete:
@@ -221,6 +247,7 @@ Report to user:
 
 All sub-issues have been implemented as stacked PRs.
 
+**Parent Issue:** {issue-identifier} marked as Done
 **Stack PRs:** [List the branch names / PR URLs if available]
 
 **Status:** All sub-issues are marked "In Review"
@@ -228,14 +255,13 @@ All sub-issues have been implemented as stacked PRs.
 **Next Steps:**
 1. Review the stacked PRs in order
 2. Approve and merge from bottom to top
-3. Graphite will automatically mark Linear issues as "Done" when PRs merge
 
 Use `gt log` to see the full stack structure.
 ```
 
 **IF NOT using Graphite:**
 
-Normal completion message with summary of work done.
+After marking parent issue Done, report completion with summary of work done.
 
 ## Critical Principles
 
