@@ -88,6 +88,14 @@ Keep investigation focused on what's needed for THIS issue:
 ## Context
 [Why this is needed - reference parent feature if applicable]
 
+## Flow Diagram (REQUIRED when applicable)
+[Include a Mermaid diagram if the issue involves any flow, process, or interaction]
+
+```mermaid
+flowchart TD
+    A[Start] --> B[Process] --> C[End]
+```
+
 ## Acceptance Criteria
 - [ ] [Specific, testable criterion 1]
 - [ ] [Specific, testable criterion 2]
@@ -162,6 +170,32 @@ Issue is ready for immediate work. Any developer or AI can pick this up.
 - Strong parent feature context already exists
 - Directly references specific code locations
 
+## Mermaid Diagrams (REQUIRED when applicable)
+
+**ALWAYS include Mermaid diagrams in issue descriptions when the work involves:**
+- User flows or interaction sequences
+- Data processing pipelines
+- State transitions or status changes
+- API/service communication patterns
+- Component relationships
+
+Linear renders Mermaid diagrams natively. Use standard markdown code fences:
+
+```markdown
+```mermaid
+flowchart TD
+    A[User Action] --> B{Validate}
+    B -->|Valid| C[Process]
+    B -->|Invalid| D[Error]
+```
+```
+
+**Common diagram types:**
+- `flowchart TD` - Top-down process flows
+- `flowchart LR` - Left-right horizontal flows
+- `sequenceDiagram` - API calls, service interactions
+- `stateDiagram-v2` - Status/state transitions
+
 ## Quality Assurance Mechanisms
 
 1. **Self-Verification Checklist**:
@@ -170,6 +204,7 @@ Issue is ready for immediate work. Any developer or AI can pick this up.
    - [ ] Codebase investigation completed and proportional
    - [ ] Issue title is clear and concise
    - [ ] Issue description follows template structure
+   - [ ] **Mermaid diagram included if issue involves any flow or process**
    - [ ] Acceptance criteria are specific and testable
    - [ ] Implementation notes include investigation findings
    - [ ] Status set to "Todo"

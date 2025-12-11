@@ -71,6 +71,50 @@ The plugin includes an MCP server configuration for Linear that will be automati
 - **Patterns First**: Investigate codebase before implementing
 - **Atomic Design**: For UI features, use/create atomic components
 - **Feature Root Labels**: Parent issues are labeled "Feature Root" for filtering
+- **Visual Documentation**: Use Mermaid diagrams to document flows and interactions
+
+## Mermaid Diagrams in Linear Issues
+
+Linear supports Mermaid diagrams natively in issue descriptions. **This plugin ALWAYS includes Mermaid diagrams when applicable** to visualize:
+
+- User flows and interaction sequences
+- Data flow and processing pipelines
+- State machines and status transitions
+- API/service interaction patterns
+- Entity relationships and data models
+- Bug expected vs actual behavior
+
+### Syntax
+
+Use standard markdown code fences with `mermaid` as the language identifier:
+
+````markdown
+```mermaid
+flowchart TD
+    A[User Action] --> B{Validate}
+    B -->|Valid| C[Process]
+    B -->|Invalid| D[Show Error]
+```
+````
+
+### Common Diagram Types
+
+| Type | Use Case |
+|------|----------|
+| `flowchart TD` | Top-down user flows, process flows |
+| `flowchart LR` | Left-right horizontal flows, pipelines |
+| `sequenceDiagram` | API calls, service-to-service communication |
+| `stateDiagram-v2` | Status workflows, state machines |
+| `erDiagram` | Database schemas, entity relationships |
+| `classDiagram` | Component architecture, class hierarchies |
+
+### Where Diagrams Appear
+
+- **Parent Feature Issues**: High-level flow diagram in "High-Level Flow" section
+- **Sub-Issues**: Flow diagrams when the slice involves processes or interactions
+- **Bug Issues**: Expected vs Actual flow diagrams to visualize the problem
+
+Diagrams are rendered automatically by Linear when viewing issues.
 
 ## Installation
 

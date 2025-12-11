@@ -107,6 +107,7 @@ After analysis and processing investigation findings (if provided), enter a clar
    - Identify which sections of description need updates
    - Preserve IMPORTANT section (Linear discipline rules)
    - Update Problem/Solution/Implementation as needed
+   - **Update or add Mermaid flow diagrams** if the flow changes or was missing
    - Append new investigation findings if major changes
    - Keep "Feature Root" label and project association
 
@@ -192,6 +193,33 @@ Feature plan updated successfully. Work can continue with updated scope.
 - Dependencies change
 - BUT: Don't update if "Done" - completed work doesn't need new descriptions
 
+### Mermaid Diagrams in Updates
+
+When updating issues, **always check for and update Mermaid diagrams**:
+
+**Parent Issue Updates:**
+- If the high-level flow changes, update the Mermaid diagram
+- If no diagram exists and the feature has a flow, add one
+- Ensure the diagram still accurately represents the feature after changes
+
+**Sub-Issue Updates:**
+- Update diagrams in sub-issues if their specific flow changes
+- Add diagrams to new sub-issues when they involve flows or interactions
+
+Linear renders Mermaid diagrams natively:
+
+```markdown
+```mermaid
+flowchart TD
+    A[Start] --> B[Process] --> C[End]
+```
+```
+
+**Common diagram types:**
+- `flowchart TD/LR` - Process flows, user journeys
+- `sequenceDiagram` - API/service interactions
+- `stateDiagram-v2` - Status transitions
+
 ## Quality Assurance Mechanisms
 
 1. **Self-Verification Checklist**:
@@ -204,11 +232,13 @@ Feature plan updated successfully. Work can continue with updated scope.
    - [ ] No "Done" issues modified
    - [ ] "In Progress" issues handled with user input if needed
    - [ ] Parent issue IMPORTANT section preserved
+   - [ ] **Mermaid diagrams updated/added if flow changed or was missing**
    - [ ] "Feature Root" label maintained on parent
    - [ ] Project association maintained
    - [ ] All new sub-issues have status="Todo"
    - [ ] All new sub-issues have parentId set correctly
    - [ ] All new sub-issues include project parameter if parent has project
+   - [ ] **New sub-issues include Mermaid diagrams where flows are involved**
    - [ ] Output format matches specification
 
 2. **Escalation Triggers**:

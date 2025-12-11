@@ -81,4 +81,53 @@ Apply this skill when:
 - **Hidden dependencies**: Not mentioning blockers
 - **Scope creep**: Adding "nice to haves"
 
+## Mermaid Diagrams in Linear Issues
+
+**ALWAYS include Mermaid diagrams when applicable.** Linear supports Mermaid diagrams natively in issue descriptions. Use them to visualize:
+
+- User flows and interaction sequences
+- Data flow and processing pipelines
+- State machines and lifecycle transitions
+- Component relationships and dependencies
+- API/service interaction patterns
+- Entity relationships and data models
+
+### Mermaid Syntax in Linear
+
+Use standard markdown code fences with `mermaid` as the language identifier:
+
+````markdown
+```mermaid
+flowchart TD
+    A[Start] --> B[End]
+```
+````
+
+### Common Diagram Types
+
+| Type | Use Case | Syntax |
+|------|----------|--------|
+| `flowchart TD` | Top-down user flows, process flows | `flowchart TD` |
+| `flowchart LR` | Left-right horizontal flows | `flowchart LR` |
+| `sequenceDiagram` | API calls, service interactions | `sequenceDiagram` |
+| `stateDiagram-v2` | State machines, status transitions | `stateDiagram-v2` |
+| `erDiagram` | Database schemas, entity relationships | `erDiagram` |
+| `classDiagram` | Class relationships, component structure | `classDiagram` |
+
+### When to Include Diagrams
+
+**Always include a diagram when:**
+- Describing a multi-step process or user flow
+- Explaining how components interact
+- Documenting state transitions
+- Showing data flow between systems
+- Illustrating API call sequences
+- Mapping entity relationships
+
+**The diagram should appear in:**
+- Parent issue "High-Level Implementation" section
+- Sub-issue descriptions when flow context is needed
+- Bug reports when showing expected vs actual flow
+- Any issue where visual clarity aids understanding
+
 Remember: **A good issue can be executed by anyone who reads it.**

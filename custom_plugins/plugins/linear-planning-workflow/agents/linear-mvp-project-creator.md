@@ -130,6 +130,17 @@ All development work must be tracked through Linear issues. Follow these discipl
 ## Solution
 [What we're building]
 
+## High-Level Flow (REQUIRED)
+[Include a Mermaid diagram showing the main user/data flow for this feature]
+
+```mermaid
+flowchart TD
+    A[User Action] --> B[System Process]
+    B --> C{Decision Point}
+    C -->|Path A| D[Outcome A]
+    C -->|Path B| E[Outcome B]
+```
+
 ## High-Level Implementation
 [Key technical decisions, architecture patterns, technologies]
 
@@ -167,6 +178,35 @@ All development work must be tracked through Linear issues. Follow these discipl
 - For refactor issues: describe the problem pattern and desired improvement
 - For atomic design issues: specify component type (atom/molecule/organism) and usage
 - Testing issues should specify minimal test coverage needed to ensure functionality works
+- **ALWAYS include Mermaid diagrams** where flows, processes, or interactions need to be shown
+
+### Mermaid Diagrams (MANDATORY for Features)
+
+**Parent issues MUST include a high-level flow diagram.** Sub-issues should include diagrams when they involve flows or interactions.
+
+Linear renders Mermaid diagrams natively. Use standard markdown code fences:
+
+```markdown
+```mermaid
+flowchart TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Action A]
+    B -->|No| D[Action B]
+```
+```
+
+**Diagram types to use:**
+- `flowchart TD` - User journeys, process flows (most common for features)
+- `flowchart LR` - Horizontal data flows, pipelines
+- `sequenceDiagram` - API calls, service-to-service communication
+- `stateDiagram-v2` - Status workflows, state machines
+- `erDiagram` - Data models, entity relationships
+
+**Include diagrams for:**
+- Parent issue: High-level user/system flow for the entire feature
+- Sub-issues: Specific flows within that slice when relevant
+- API sub-issues: Sequence diagrams for service interactions
+- Data sub-issues: ER diagrams for schema changes
 
 ## Output Format
 
@@ -241,11 +281,13 @@ Ready for development. Any AI can now pick up sub-issues from this parent issue 
    - [ ] All ambiguities and unclear requirements resolved through clarification
    - [ ] MVP scope clearly defined with deferrals noted (minimum work to make it functional)
    - [ ] Parent issue description follows exact format with IMPORTANT section first
+   - [ ] **Parent issue includes high-level Mermaid flow diagram**
    - [ ] Parent issue created with project association (if project ID provided)
    - [ ] Parent issue labeled with "Feature Root" for easy filtering
    - [ ] All sub-issues created with status set to "Todo" (NOT "Triage")
    - [ ] All sub-issues properly linked with parentId to parent issue
    - [ ] All sub-issues include project parameter (if project ID provided)
+   - [ ] **Sub-issues include Mermaid diagrams where flows/interactions are involved**
    - [ ] All bad patterns flagged with refactor sub-issues created (only for code being touched)
    - [ ] Atomic design components mapped (if UI)
    - [ ] Each sub-issue has clear acceptance criteria (focused on minimal functionality)

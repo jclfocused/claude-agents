@@ -115,6 +115,22 @@ For each bug, conduct focused investigation:
 ## Error Details
 [Error messages, logs, stack traces - preserve exactly as provided]
 
+## Expected vs Actual Flow (INCLUDE WHEN APPLICABLE)
+[Use Mermaid diagrams to visualize the bug - show what's happening vs what should happen]
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant S as System
+    Note over U,S: ACTUAL (Bug)
+    U->>S: Action
+    S--xU: Fails/Wrong Result
+
+    Note over U,S: EXPECTED
+    U->>S: Action
+    S-->>U: Correct Result
+```
+
 ## Investigation Findings
 [Summarize codebase investigation results]
 - File locations: [specific paths]
@@ -135,6 +151,54 @@ For each bug, conduct focused investigation:
 - Preserve all error messages, logs, and important details
 - Include line numbers and code snippets when relevant
 - For sub-issues: clearly state the specific investigation or fix task
+- **Include Mermaid diagrams** to visualize the bug when flows are involved
+
+### Mermaid Diagrams for Bug Issues (REQUIRED when applicable)
+
+**ALWAYS include Mermaid diagrams when the bug involves:**
+- Process flows or user journeys
+- API/service communication
+- State transitions that fail
+- Data flow issues
+
+**Use diagrams to show Expected vs Actual behavior:**
+
+```markdown
+```mermaid
+flowchart LR
+    subgraph Actual[Actual - BUG]
+        A1[Click Submit] --> B1[Loading...]
+        B1 --> C1[Nothing Happens]
+    end
+
+    subgraph Expected[Expected]
+        A2[Click Submit] --> B2[Loading...]
+        B2 --> C2[Success Message]
+    end
+```
+```
+
+**Or use sequence diagrams for API bugs:**
+
+```markdown
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant A as API
+    participant D as Database
+
+    Note over C,D: Bug: Timeout on large datasets
+    C->>A: GET /data
+    A->>D: Query
+    D--xA: Timeout after 30s
+    A--xC: 504 Gateway Timeout
+```
+```
+
+**Common diagram types for bugs:**
+- `flowchart` - UI flows, process bugs
+- `sequenceDiagram` - API timeouts, communication failures
+- `stateDiagram-v2` - State machine bugs, invalid transitions
 
 ### Phase 7: Label Management
 1. Query available labels using mcp__linear-server__list_issue_labels
@@ -224,6 +288,7 @@ All issues are ready for assignment and work.
 - [ ] All issues associated to the project using project parameter
 - [ ] "bug" label exists and applied to all issues
 - [ ] Issue descriptions include error details, logs, and investigation findings
+- [ ] **Mermaid diagrams included for bugs involving flows or interactions**
 - [ ] Sub-issues created where appropriate with parentId
 - [ ] Each issue has clear acceptance criteria
 - [ ] Sub-issues properly linked with parentId parameter

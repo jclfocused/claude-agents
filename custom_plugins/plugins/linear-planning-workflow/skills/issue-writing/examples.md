@@ -39,6 +39,25 @@ Implement a password reset flow via email with secure token validation.
 - Admin password reset capability (separate feature)
 ```
 
+### User Flow Diagram
+
+```mermaid
+flowchart TD
+    A[User clicks Forgot Password] --> B[Enter Email]
+    B --> C{Email Valid?}
+    C -->|No| D[Show Validation Error]
+    D --> B
+    C -->|Yes| E[Submit Request]
+    E --> F{Email Exists?}
+    F -->|No| G[Show Generic Success]
+    F -->|Yes| H[Send Reset Email]
+    H --> G
+    G --> I[User Checks Email]
+    I --> J[Click Reset Link]
+    J --> K[Enter New Password]
+    K --> L[Password Updated]
+```
+
 ---
 
 ## Example: Sub-Issue (Vertical Slice)
@@ -141,3 +160,59 @@ Likely issue in form state management, check useForm hook.
 - Clear scope
 - Testable outcome
 - Reasonable size
+
+---
+
+## Example: Bug Issue with Diagram
+
+### Fix: Order Status Not Updating in Real-Time
+
+```markdown
+## Bug Description
+When an order status changes in the backend, the frontend dashboard doesn't
+update in real-time. Users see stale status until they manually refresh.
+
+## Current vs Expected Flow
+
+```mermaid
+sequenceDiagram
+    participant Admin
+    participant Backend
+    participant WebSocket
+    participant Dashboard
+
+    Admin->>Backend: Update Order Status
+    Backend->>Backend: Save to DB ✓
+    Backend--xWebSocket: Broadcast Update ✗
+    Note over WebSocket: Message never sent!
+    Dashboard->>Dashboard: Shows stale data
+```
+
+## Expected Flow
+
+```mermaid
+sequenceDiagram
+    participant Admin
+    participant Backend
+    participant WebSocket
+    participant Dashboard
+
+    Admin->>Backend: Update Order Status
+    Backend->>Backend: Save to DB
+    Backend->>WebSocket: Broadcast Update
+    WebSocket->>Dashboard: Push Status Change
+    Dashboard->>Dashboard: Update UI
+```
+
+## Steps to Reproduce
+1. Open order dashboard in browser
+2. Change order status via admin panel
+3. Observe dashboard - status doesn't update
+4. Refresh browser - status now shows correctly
+
+## Acceptance Criteria
+- [ ] Order status updates appear in real-time (within 2 seconds)
+- [ ] WebSocket connection properly established on dashboard load
+- [ ] Backend broadcasts status changes to connected clients
+- [ ] Regression test added for WebSocket broadcast on status change
+```

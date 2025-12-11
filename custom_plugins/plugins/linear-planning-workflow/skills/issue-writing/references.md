@@ -87,3 +87,80 @@ Refactor [component/area] to [improvement].
 - [ ] [Expected behavior works]
 - [ ] Regression test added
 ```
+
+## Mermaid Diagram Quick Reference
+
+Linear renders Mermaid diagrams natively. **Always include diagrams when flows need to be shown or understood.**
+
+### Flowchart (Most Common)
+```markdown
+```mermaid
+flowchart TD
+    A[User Action] --> B{Validation}
+    B -->|Valid| C[Process Request]
+    B -->|Invalid| D[Show Error]
+    C --> E[Update Database]
+    E --> F[Return Response]
+```
+```
+
+### Sequence Diagram (API/Service Flows)
+```markdown
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant A as API
+    participant D as Database
+
+    U->>F: Click Submit
+    F->>A: POST /api/data
+    A->>D: INSERT query
+    D-->>A: Success
+    A-->>F: 200 OK
+    F-->>U: Show confirmation
+```
+```
+
+### State Diagram (Status Transitions)
+```markdown
+```mermaid
+stateDiagram-v2
+    [*] --> Draft
+    Draft --> Pending: Submit
+    Pending --> Approved: Approve
+    Pending --> Rejected: Reject
+    Approved --> Published: Publish
+    Rejected --> Draft: Edit
+    Published --> [*]
+```
+```
+
+### Entity Relationship Diagram (Data Models)
+```markdown
+```mermaid
+erDiagram
+    USER ||--o{ ORDER : places
+    ORDER ||--|{ LINE_ITEM : contains
+    PRODUCT ||--o{ LINE_ITEM : "ordered in"
+    USER {
+        int id PK
+        string email
+        string name
+    }
+    ORDER {
+        int id PK
+        int user_id FK
+        date created_at
+    }
+```
+```
+
+### When to Use Each Type
+| Diagram Type | Best For |
+|--------------|----------|
+| `flowchart TD/LR` | User journeys, decision trees, process flows |
+| `sequenceDiagram` | API calls, service-to-service communication |
+| `stateDiagram-v2` | Status workflows, lifecycle management |
+| `erDiagram` | Database schemas, data relationships |
+| `classDiagram` | Component architecture, class hierarchies |
