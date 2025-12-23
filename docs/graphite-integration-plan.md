@@ -183,7 +183,7 @@ Step 3: Learn Repository Patterns
 - Check for existing components (atomic design)
 
 Step 4: Mark Issue "In Progress"
-- Linear: mcp__linear-server__update_issue with state: "In Progress"
+- Linear: mcp__linear__update_issue with state: "In Progress"
 - Jira: mcp__mcp-atlassian__jira_transition_issue
 
 Step 5: Execute Work (MVP Scope Only)

@@ -12,7 +12,7 @@ $ARGUMENTS
 
 First, list all existing Linear projects with their current status:
 
-1. Use `mcp__linear-server__list_projects` with `limit: 250` to fetch all projects
+1. Use `mcp__linear__list_projects` with `limit: 250` to fetch all projects
 2. **Filter out completed projects**: Exclude any projects where `status.name` is "Completed" or "Canceled"
 3. Use `AskUserQuestion` to prompt the user with all active/planned projects:
    - **question**: "Which project should this feature be associated with?"

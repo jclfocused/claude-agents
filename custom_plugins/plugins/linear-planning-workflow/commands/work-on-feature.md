@@ -31,10 +31,10 @@ $ARGUMENTS
 
 **IMPORTANT: Mark Parent Issue In Progress**
 
-After successfully retrieving the parent feature issue, **immediately transition it to "In Progress"** using `mcp__linear-server__update_issue`:
+After successfully retrieving the parent feature issue, **immediately transition it to "In Progress"** using `mcp__linear__update_issue`:
 
 ```
-mcp__linear-server__update_issue({
+mcp__linear__update_issue({
   id: "{parent_issue_uuid}",
   state: "In Progress"
 })
@@ -222,10 +222,10 @@ Continue loop until:
 
 **IMPORTANT: Mark Parent Issue Done**
 
-When all sub-issues are complete, **transition the parent feature issue to "Done"** using `mcp__linear-server__update_issue`:
+When all sub-issues are complete, **transition the parent feature issue to "Done"** using `mcp__linear__update_issue`:
 
 ```
-mcp__linear-server__update_issue({
+mcp__linear__update_issue({
   id: "{parent_issue_uuid}",
   state: "Done"
 })

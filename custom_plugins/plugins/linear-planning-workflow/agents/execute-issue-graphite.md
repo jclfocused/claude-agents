@@ -1,7 +1,7 @@
 ---
 name: execute-issue-graphite
 description: Use this agent when implementing a Linear sub-issue as a Graphite stacked PR. This agent creates stacked branches for each issue, enabling parallel PR reviews while maintaining strict MVP adherence.\n\nExamples:\n\n<example>\nContext: User is using Graphite stacking for a feature and wants to implement the next sub-issue.\nuser: "Please implement Linear sub-issue LIN-123 as a stacked PR"\nassistant: "I'll use the execute-issue-graphite agent to implement this sub-issue as a Graphite stacked branch."\n</example>\n\n<example>\nContext: Orchestrator is working through a feature with Graphite stacking enabled.\norchestrator: "Implement LIN-456 under parent LIN-100, stacking on current branch"\nassistant: "I'll launch execute-issue-graphite to create a stacked PR for this sub-issue."\n</example>
-tools: Bash, Glob, Grep, Read, Edit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, AskUserQuestion, Skill, SlashCommand, mcp__playwright__browser_close, mcp__playwright__browser_resize, mcp__playwright__browser_console_messages, mcp__playwright__browser_handle_dialog, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_fill_form, mcp__playwright__browser_install, mcp__playwright__browser_press_key, mcp__playwright__browser_type, mcp__playwright__browser_navigate, mcp__playwright__browser_navigate_back, mcp__playwright__browser_network_requests, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_click, mcp__playwright__browser_drag, mcp__playwright__browser_hover, mcp__playwright__browser_select_option, mcp__playwright__browser_tabs, mcp__playwright__browser_wait_for, ListMcpResourcesTool, ReadMcpResourceTool, mcp__linear-server__list_comments, mcp__linear-server__create_comment, mcp__linear-server__list_cycles, mcp__linear-server__get_document, mcp__linear-server__list_documents, mcp__linear-server__get_issue, mcp__linear-server__list_issues, mcp__linear-server__create_issue, mcp__linear-server__update_issue, mcp__linear-server__list_issue_statuses, mcp__linear-server__get_issue_status, mcp__linear-server__list_issue_labels, mcp__linear-server__create_issue_label, mcp__linear-server__list_projects, mcp__linear-server__get_project, mcp__linear-server__create_project, mcp__linear-server__update_project, mcp__linear-server__list_project_labels, mcp__linear-server__list_teams, mcp__linear-server__get_team, mcp__linear-server__list_users, mcp__linear-server__get_user, mcp__linear-server__search_documentation, mcp__graphite__run_gt_cmd, mcp__graphite__learn_gt
+tools: Bash, Glob, Grep, Read, Edit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, AskUserQuestion, Skill, SlashCommand, mcp__playwright__browser_close, mcp__playwright__browser_resize, mcp__playwright__browser_console_messages, mcp__playwright__browser_handle_dialog, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_fill_form, mcp__playwright__browser_install, mcp__playwright__browser_press_key, mcp__playwright__browser_type, mcp__playwright__browser_navigate, mcp__playwright__browser_navigate_back, mcp__playwright__browser_network_requests, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_click, mcp__playwright__browser_drag, mcp__playwright__browser_hover, mcp__playwright__browser_select_option, mcp__playwright__browser_tabs, mcp__playwright__browser_wait_for, ListMcpResourcesTool, ReadMcpResourceTool, mcp__linear__list_comments, mcp__linear__create_comment, mcp__linear__list_cycles, mcp__linear__get_document, mcp__linear__list_documents, mcp__linear__get_issue, mcp__linear__list_issues, mcp__linear__create_issue, mcp__linear__update_issue, mcp__linear__list_issue_statuses, mcp__linear__get_issue_status, mcp__linear__list_issue_labels, mcp__linear__create_issue_label, mcp__linear__list_projects, mcp__linear__get_project, mcp__linear__create_project, mcp__linear__update_project, mcp__linear__list_project_labels, mcp__linear__list_teams, mcp__linear__get_team, mcp__linear__list_users, mcp__linear__get_user, mcp__linear__search_documentation, mcp__graphite__run_gt_cmd, mcp__graphite__learn_gt
 model: opus
 color: green
 ---
@@ -63,7 +63,7 @@ Example:
 # Execution Workflow
 
 ## Step 1: Verify MCP Access
-- Test Linear MCP: `mcp__linear-server__get_issue`
+- Test Linear MCP: `mcp__linear__get_issue`
 - Test Graphite MCP: `mcp__graphite__run_gt_cmd` with `["log"]`
 - If either unavailable, STOP immediately and report failure
 - Do not proceed without both MCP tools accessible
@@ -82,7 +82,7 @@ Example:
 - Document patterns found for reference during implementation
 
 ## Step 4: Mark Issue In Progress
-- Use `mcp__linear-server__update_issue` to set issue state to "In Progress"
+- Use `mcp__linear__update_issue` to set issue state to "In Progress"
 - Confirm status update succeeded
 
 ## Step 5: Execute Work (MVP Scope Only)
@@ -131,10 +131,10 @@ Add the Graphite branch name to the issue for tracking:
 
 ```javascript
 // Get current issue to preserve existing description
-const issue = await mcp__linear-server__get_issue({ id: "issue-uuid" });
+const issue = await mcp__linear__get_issue({ id: "issue-uuid" });
 
 // Append branch info to description
-mcp__linear-server__update_issue({
+mcp__linear__update_issue({
   id: "issue-uuid",
   description: issue.description + "\n\n---\n**Graphite Branch:** `lin-456-add-login-form`"
 })
@@ -142,7 +142,7 @@ mcp__linear-server__update_issue({
 
 Or add as a comment:
 ```javascript
-mcp__linear-server__create_comment({
+mcp__linear__create_comment({
   issueId: "issue-uuid",
   body: "**Graphite Branch:** `lin-456-add-login-form`\n\nReady for PR review once orchestrator submits the stack."
 })
@@ -155,13 +155,13 @@ mcp__linear-server__create_comment({
 - Graphite will mark it "Done" when the PR merges
 
 ```javascript
-mcp__linear-server__update_issue({
+mcp__linear__update_issue({
   id: "issue-uuid",
   state: "In Review"  // Or the appropriate "In Review" state ID for this team
 })
 ```
 
-**Note**: You may need to use `mcp__linear-server__list_issue_statuses` to find the correct "In Review" state ID for the team.
+**Note**: You may need to use `mcp__linear__list_issue_statuses` to find the correct "In Review" state ID for the team.
 
 ## Step 9: Return Summary
 

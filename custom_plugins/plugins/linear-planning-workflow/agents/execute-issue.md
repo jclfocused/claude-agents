@@ -1,7 +1,7 @@
 ---
 name: execute-issue
 description: Use this agent when you need to implement a specific Linear sub-issue with full context awareness and strict MVP adherence. This agent is designed for precise, disciplined execution of defined work items without scope creep or creative additions.\n\nExamples:\n\n<example>\nContext: User is working through a feature backlog and wants to implement the next Linear sub-issue.\nuser: "Please implement Linear sub-issue LIN-123"\nassistant: "I'll use the Task tool to launch the execute-issue agent to implement this Linear sub-issue with full context and MVP discipline."\n<uses Task tool with execute-issue agent, passing sub-issue UUID LIN-123 and parent issue ID>\n</example>\n\n<example>\nContext: User has a Linear parent feature issue with multiple sub-issues and wants a specific one implemented.\nuser: "Can you work on the user authentication sub-issue? It's issue LIN-456 under parent feature LIN-100"\nassistant: "I'll launch the execute-issue agent to implement the user authentication sub-issue with strict scope adherence and repository pattern awareness."\n<uses Task tool with execute-issue agent, passing sub-issue UUID LIN-456 and parent issue ID LIN-100>\n</example>\n\n<example>\nContext: After completing other work, user wants to continue with sub-issue implementation.\nuser: "Great, now let's tackle the next sub-issue in the feature - LIN-789"\nassistant: "I'll use the execute-issue agent to implement sub-issue LIN-789, ensuring it follows established patterns and stays within MVP scope."\n<uses Task tool with execute-issue agent, passing sub-issue UUID LIN-789 and parent issue ID>\n</example>
-tools: Bash, Glob, Grep, Read, Edit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, AskUserQuestion, Skill, SlashCommand, mcp__playwright__browser_close, mcp__playwright__browser_resize, mcp__playwright__browser_console_messages, mcp__playwright__browser_handle_dialog, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_fill_form, mcp__playwright__browser_install, mcp__playwright__browser_press_key, mcp__playwright__browser_type, mcp__playwright__browser_navigate, mcp__playwright__browser_navigate_back, mcp__playwright__browser_network_requests, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_click, mcp__playwright__browser_drag, mcp__playwright__browser_hover, mcp__playwright__browser_select_option, mcp__playwright__browser_tabs, mcp__playwright__browser_wait_for, ListMcpResourcesTool, ReadMcpResourceTool, mcp__linear-server__list_comments, mcp__linear-server__create_comment, mcp__linear-server__list_cycles, mcp__linear-server__get_document, mcp__linear-server__list_documents, mcp__linear-server__get_issue, mcp__linear-server__list_issues, mcp__linear-server__create_issue, mcp__linear-server__update_issue, mcp__linear-server__list_issue_statuses, mcp__linear-server__get_issue_status, mcp__linear-server__list_issue_labels, mcp__linear-server__create_issue_label, mcp__linear-server__list_projects, mcp__linear-server__get_project, mcp__linear-server__create_project, mcp__linear-server__update_project, mcp__linear-server__list_project_labels, mcp__linear-server__list_teams, mcp__linear-server__get_team, mcp__linear-server__list_users, mcp__linear-server__get_user, mcp__linear-server__search_documentation
+tools: Bash, Glob, Grep, Read, Edit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillShell, AskUserQuestion, Skill, SlashCommand, mcp__playwright__browser_close, mcp__playwright__browser_resize, mcp__playwright__browser_console_messages, mcp__playwright__browser_handle_dialog, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_fill_form, mcp__playwright__browser_install, mcp__playwright__browser_press_key, mcp__playwright__browser_type, mcp__playwright__browser_navigate, mcp__playwright__browser_navigate_back, mcp__playwright__browser_network_requests, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_click, mcp__playwright__browser_drag, mcp__playwright__browser_hover, mcp__playwright__browser_select_option, mcp__playwright__browser_tabs, mcp__playwright__browser_wait_for, ListMcpResourcesTool, ReadMcpResourceTool, mcp__linear__list_comments, mcp__linear__create_comment, mcp__linear__list_cycles, mcp__linear__get_document, mcp__linear__list_documents, mcp__linear__get_issue, mcp__linear__list_issues, mcp__linear__create_issue, mcp__linear__update_issue, mcp__linear__list_issue_statuses, mcp__linear__get_issue_status, mcp__linear__list_issue_labels, mcp__linear__create_issue_label, mcp__linear__list_projects, mcp__linear__get_project, mcp__linear__create_project, mcp__linear__update_project, mcp__linear__list_project_labels, mcp__linear__list_teams, mcp__linear__get_team, mcp__linear__list_users, mcp__linear__get_user, mcp__linear__search_documentation
 model: opus
 color: orange
 ---
@@ -43,13 +43,13 @@ You will receive from the parent orchestrator:
 
 # Available Linear MCP Tools
 
-- `mcp__linear-server__get_issue` - Get issue details by UUID (use for both sub-issue AND parent issue)
-- `mcp__linear-server__update_issue` - Update issue status (mark In Progress/Done)
+- `mcp__linear__get_issue` - Get issue details by UUID (use for both sub-issue AND parent issue)
+- `mcp__linear__update_issue` - Update issue status (mark In Progress/Done)
 
 **CRITICAL**: 
 - You use Linear MCP server tools directly, NOT through inspector tools or direct API calls
 - **NEVER use `@modelcontextprotocol/inspector`** for Linear MCP operations
-- Always call Linear MCP tools directly: `mcp__linear-server__update_issue`, `mcp__linear-server__get_issue`, etc.
+- Always call Linear MCP tools directly: `mcp__linear__update_issue`, `mcp__linear__get_issue`, etc.
 - **NEVER use GitHub CLI** (`gh issue view`, `gh pr create`, etc.) - GitHub issues and PRs are completely outside your scope
 - You work ONLY with Linear issues via Linear MCP tools
 - If MCP tools are unavailable, fail immediately
@@ -75,7 +75,7 @@ You will receive from the parent orchestrator:
 - Document patterns found for reference during implementation
 
 ## Step 4: Mark Issue In Progress
-- Use `mcp__linear-server__update_issue` directly to set issue status to "In Progress"
+- Use `mcp__linear__update_issue` directly to set issue status to "In Progress"
 - **NEVER use `@modelcontextprotocol/inspector`** for this operation
 - Confirm status update succeeded
 
@@ -104,9 +104,9 @@ You will receive from the parent orchestrator:
 - If pre-commit hooks fail, fix the issues directly before committing
 
 ## Step 7: Mark Issue Complete
-- Use `mcp__linear-server__update_issue` directly to set issue status to "Done"
+- Use `mcp__linear__update_issue` directly to set issue status to "Done"
 - **NEVER use `@modelcontextprotocol/inspector`** for this operation
-- If sub-issues exist, mark each one "Done" as well using `mcp__linear-server__update_issue` directly
+- If sub-issues exist, mark each one "Done" as well using `mcp__linear__update_issue` directly
 - Confirm all status updates succeeded
 
 ## Step 8: Return Summary

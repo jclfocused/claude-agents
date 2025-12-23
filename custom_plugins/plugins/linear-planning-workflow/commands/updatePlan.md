@@ -12,7 +12,7 @@ $ARGUMENTS
 
 First, list all existing feature root issues:
 
-1. Use `mcp__linear-server__list_issues` with `label: "Feature Root"` to fetch all root feature issues (filter directly by label name - don't check for label existence first)
+1. Use `mcp__linear__list_issues` with `label: "Feature Root"` to fetch all root feature issues (filter directly by label name - don't check for label existence first)
 2. **Filter to active features**: Exclude issues with status "Done" or "Canceled"
 3. Use `AskUserQuestion` to prompt the user to select which feature to update:
    - **question**: "Which feature plan should be updated?"
@@ -25,8 +25,8 @@ First, list all existing feature root issues:
 
 ## Step 2: Load Current Feature State
 
-1. Use `mcp__linear-server__get_issue` to fetch the full parent issue details
-2. Use `mcp__linear-server__list_issues` with `parentId` set to the parent issue ID to fetch all sub-issues (and their sub-issues recursively)
+1. Use `mcp__linear__get_issue` to fetch the full parent issue details
+2. Use `mcp__linear__list_issues` with `parentId` set to the parent issue ID to fetch all sub-issues (and their sub-issues recursively)
 3. Analyze the current structure:
    - What sub-issues exist?
    - What is their status (Todo, In Progress, Done)?
@@ -101,8 +101,8 @@ The agent will:
    - **Add new**: New sub-issues required for the updated scope
 
 4. **Execute changes**:
-   - Use `mcp__linear-server__update_issue` to update parent and existing sub-issues
-   - Use `mcp__linear-server__create_issue` to add new sub-issues
+   - Use `mcp__linear__update_issue` to update parent and existing sub-issues
+   - Use `mcp__linear__create_issue` to add new sub-issues
    - Mark obsolete sub-issues as "Canceled" (use update_issue with state="Canceled")
    - **IMPORTANT**: Never delete completed (Done) sub-issues - they represent finished work
 

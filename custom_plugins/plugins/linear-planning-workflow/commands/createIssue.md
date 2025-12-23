@@ -12,7 +12,7 @@ $ARGUMENTS
 
 First, list all existing Feature Root issues for optional parent association:
 
-1. Use `mcp__linear-server__list_issues` with `label: "Feature Root"` to fetch all root feature issues (filter directly by label name - don't check for label existence first)
+1. Use `mcp__linear__list_issues` with `label: "Feature Root"` to fetch all root feature issues (filter directly by label name - don't check for label existence first)
 2. **Filter to active features**: Exclude issues with status "Done" or "Canceled"
 3. Use `AskUserQuestion` to prompt the user with all active features plus a "no parent" option:
    - **question**: "Should this issue be associated with a feature parent?"
