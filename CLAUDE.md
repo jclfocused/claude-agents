@@ -6,6 +6,19 @@
 **NEVER assume caching** - Errors are real. Check imports, paths, exports.
 **NEVER push code** - Commits stay local until pipelines configured.
 **ALWAYS test builds** - Run `npm run build` before committing.
+**NEVER blame external factors** - Problems are almost ALWAYS in your code/config, not caching, stale deploys, Docker issues, or environment. Investigate the actual code first.
+**NEVER kill user applications** - Do NOT pkill/kill Chrome, browsers, Slack, or any user apps. Only kill processes YOU started (flutter run, npm, build processes, etc.).
+
+## **NEVER ASSUME TESTS ARE "PRE-EXISTING FAILURES"**
+
+**Failing tests ALWAYS need to be fixed.** No exceptions unless the user explicitly says to skip them.
+
+- If a test fails, it means something is broken - investigate and fix it
+- Do NOT assume test failures are "pre-existing" or "unrelated to changes"
+- Do NOT suggest skipping tests or using `--no-verify`
+- Do NOT use `eslint-disable` comments to bypass issues
+- Do NOT use `@ts-ignore` or implicit `any` types as shortcuts
+- Fix tests properly with correct types and logic
 
 ## Node.js
 - Use Node.js 22 by default

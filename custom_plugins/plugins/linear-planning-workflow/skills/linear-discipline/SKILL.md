@@ -70,11 +70,40 @@ Todo → In Progress → Done
       Blocked → In Progress → Done
 ```
 
+## Plan Mode Integration
+
+When using Claude Code's built-in plan mode, Linear tracking happens automatically:
+
+### How It Works
+
+1. **Plan mode entry** - Skill `linear-plan-mode` asks if plan should be tracked in Linear
+2. **Plan development** - As you write the plan file, Linear issues are created/updated
+3. **Plan sections → Sub-issues** - Each major section becomes a Linear sub-issue
+4. **Plan finalization** - Before ExitPlanMode, ensure all sections have issues
+
+### Key Behaviors
+
+- Plan file and Linear stay synchronized throughout planning
+- New sections → new sub-issues created
+- Modified sections → sub-issues updated
+- Removed sections → sub-issues canceled (with confirmation)
+
+### Plan Mode Tools
+
+| Tool | Purpose |
+|------|---------|
+| `linear-mvp-project-creator` | Creates parent issue + sub-issues from plan |
+| `linear-project-context` | Checks for existing feature issues |
+| `linear-plan-sync` | Syncs plan file changes to Linear |
+
+For detailed plan mode workflow, see the `linear-plan-mode` skill.
+
 ## Integration with Workflow
 
 This discipline integrates with:
 - `/planFeature` - Creates properly structured issues
 - `/work-on-feature` - Enforces status tracking during execution
 - `execute-issue` agent - Automatically manages status transitions
+- `linear-plan-mode` skill - Maintains plans in Linear during plan mode
 
 Remember: **Linear is the source of truth. Keep it accurate.**

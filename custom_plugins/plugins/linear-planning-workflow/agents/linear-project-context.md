@@ -29,6 +29,49 @@ Your sole purpose is to retrieve concise, actionable information about a parent 
 6. **Return lean summaries**: Only include information needed to start or continue work
 7. **Operate efficiently**: Minimize token usage by being selective about what details to include
 
+## Plan Mode Integration
+
+When invoked from Claude Code's plan mode with `for_plan_sync: true`, you additionally:
+
+### Plan Sync Parameters
+
+```
+Feature: [feature keywords]
+for_plan_sync: true
+plan_sections: |
+  ## Phase 1: [Name]
+  ## Phase 2: [Name]
+  ...
+```
+
+### Plan Sync Behavior
+
+1. **Fetch all sub-issues** (including all statuses, not just active)
+2. **Match plan sections to sub-issues** by comparing titles
+3. **Return section-to-issue mappings** for plan sync tracking
+
+### Plan Sync Output Addition
+
+When `for_plan_sync: true`, include this additional section:
+
+```
+### Plan Section Mappings
+{
+  "parent_issue_id": "[UUID]",
+  "existing_mappings": {
+    "## Phase 1: Auth": "[sub-issue-uuid-1]",
+    "## Phase 2: Dashboard": "[sub-issue-uuid-2]"
+  },
+  "unmatched_sections": ["## Phase 3: Export"],
+  "orphaned_issues": ["[sub-issue-uuid-3] - Old Feature X"]
+}
+```
+
+This helps plan mode understand:
+- Which plan sections already have Linear issues
+- Which sections need new issues created
+- Which existing issues no longer have matching plan sections
+
 ## Workflow
 
 ### Step 1: Parse Input and Find Parent Feature Issue
