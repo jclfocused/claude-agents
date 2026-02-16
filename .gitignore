@@ -9,6 +9,8 @@
 !commands/**
 !agents/
 !agents/**
+!skills/
+!skills/**
 !agent_descriptions/
 !agent_descriptions/**
 !.gitignore

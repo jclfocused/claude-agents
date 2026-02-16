@@ -7,7 +7,8 @@
 **NEVER push code** - Commits stay local until pipelines configured.
 **ALWAYS test builds** - Run `npm run build` before committing.
 **NEVER blame external factors** - Problems are almost ALWAYS in your code/config, not caching, stale deploys, Docker issues, or environment. Investigate the actual code first.
-**NEVER kill user applications** - Do NOT pkill/kill Chrome, browsers, Slack, or any user apps. Only kill processes YOU started (flutter run, npm, build processes, etc.).
+**NEVER kill user applications** - Do NOT pkill/kill Chrome, browsers, Slack, or any user apps. Only kill processes YOU started (npm, gradle, xcodebuild, build processes, etc.).
+**NEVER request Copilot reviews** - Do NOT use `request_copilot_review` or any GitHub Copilot review tools.
 
 ## **NEVER ASSUME TESTS ARE "PRE-EXISTING FAILURES"**
 
