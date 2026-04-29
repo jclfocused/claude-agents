@@ -1,7 +1,6 @@
 ---
 name: create-skill
 description: Create a new Claude Code skill from scratch. Use when the user asks to "create a skill", "make a skill", "new skill", "build a skill", "/create-skill", or says something like "create a skill for that" referencing something in the conversation.
-disable-model-invocation: true
 argument-hint: "[optional description or context]"
 ---
 

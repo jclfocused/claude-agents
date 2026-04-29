@@ -45,6 +45,13 @@ Use Edit/Write tools directly. Workflow:
 
 ## Debugging
 
+**ALWAYS assume your code is broken first.** Never attribute bugs to timing issues, caching, stale deploys, race conditions, or external factors as a first explanation. These are lazy conclusions that waste time.
+
+1. **Investigate the actual code path** — trace data flow, read the queries, check the logic
+2. **External factors are the LAST hypothesis**, not the first — only blame timing/caching/deployment if you have conclusively ruled out every code-level explanation
+3. **"It works sometimes" does NOT mean it's a timing issue** — intermittent bugs are almost always conditional logic bugs (e.g., duplicate detection, state filtering, missing edge cases)
+4. **Read error messages and query results** — don't guess at what they might contain
+
 When "X is not defined":
 - Check if X is imported
 - Check import path is correct
@@ -67,6 +74,15 @@ Before marking work done:
 - [ ] Build passes
 - [ ] Lint passes
 - [ ] Regression tests fixed
+
+## 1Password (Secret Management)
+
+Secrets are stored in 1Password, accessible via the `op` CLI. **Never hardcode secrets** — fetch from 1Password.
+
+- **Account**: `my.1password.eu` (always pass `--account` flag)
+- **Vaults**: `What-If` (Linear, Cloudflare, Supabase, Grafana, Render, Sentry, Codacy), `Hyperglot` (Apple/ASC, Supabase, Google), `Dev Tools` (GitHub, Claude Code, Gemini, Jira, Postman)
+- **Fetch**: `op read "op://Vault/Item/field" --account my.1password.eu`
+- **Use `/1password` skill** for full reference on fetching, storing, and injecting secrets
 
 ## Notion (MCP)
 
