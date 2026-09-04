@@ -5,7 +5,9 @@ description: Deploy applications to the Hetzner k3s server. This skill should be
 
 # Deploying to Hetzner k3s
 
-Procedural knowledge for deploying applications to the shared Hetzner dedicated server running k3s. All patterns are proven in production across multiple projects (franklin-data-pipeline, chatbot, hyperglot).
+**New backends do NOT default to k3s** — a new server-hosted backend on this box runs as a systemd `--user` unit + cloudflared tunnel (the `setup-backend` / `backend-box-deploy` skills route that path). Use this skill only for workloads ALREADY on k3s.
+
+Procedural knowledge for deploying applications to the shared Hetzner dedicated server running k3s. The patterns below are proven on the namespaces that actually run here — see "Existing Namespaces on Server" and regenerate that list before assuming a project is on the cluster. **hyperglot is only partly on k3s:** hyperglot prod has largely moved to ~24 `hyperglot@<svc>.service` systemd units (verified 2026-08-30 via `systemctl --user list-units 'hyperglot@*'`); only some namespaces remain.
 
 ## Server Reference
 
@@ -189,10 +191,57 @@ kubectl -n my-namespace rollout status deployment/my-app --timeout=120s
 
 ## Existing Namespaces on Server
 
-| Namespace | Project | Workloads |
-|-----------|---------|-----------|
-| `hyperglot` | hyperglot + hyperglot-book-reader | backend API, Redis, page-scheduler, cloudflared |
-| `franklin` | franklin-data-pipeline + chatbot | pipeline-orchestrator, chatbot, nginx-sticky, cloudflared, Redis |
+**Regenerate, don't trust the table** — `sudo k3s kubectl get deploy -A` (add
+`-o custom-columns='NS:.metadata.namespace,NAME:.metadata.name,IMAGE:.spec.template.spec.containers[*].image'`
+for the running image tags). The kubeconfig is root-only, so every kubectl here needs `sudo`.
+
+Live 2026-07-27 (`kube-system` omitted — coredns, local-path-provisioner, metrics-server, traefik):
+
+| Namespace | Project | Deployments (running image) |
+|-----------|---------|-----------------------------|
+| `ff` | FF API (`~/code/ff`); its tunnel also fronts slack.laserfocused.ee | `ff-api` (ff-api:bbd7b07), `cloudflared` (2025.2.1, 2 replicas) |
+| `hyperglot` | hyperglot + book-reader | `hyperglot-backend` (:9b89979), `stt-gateway` (:9e952f3), `page-scheduler` (:latest), `redis` (7-alpine), `cloudflared` (**:latest**) |
+| `mj` | mjcode | `mj-app` (:20260619-143525), `cloudflared` (2025.2.1) |
+| `speech` | speech-engine STT | `stt-gateway` (speech-stt-gateway:6e6d92b) |
+
+Notes:
+- **There is no `franklin` namespace** (an older version of this table claimed one). The
+  franklin-data-pipeline / chatbot workloads are not on this cluster; `ff` is what exists.
+- Two deployments still float on `:latest` — `hyperglot/cloudflared` and
+  `hyperglot/page-scheduler` — against the pin-your-versions rule above. Fixing that is a
+  **live-cluster change** (`kubectl set image` + rollout), so it belongs to a deliberate
+  maintenance pass with Justin, not to a drive-by edit.
+
+## Observability (required)
+
+Two halves. Read `observability` for the contract and `observability-logs` for the Alloy mechanics.
+
+**Platform half — installed ONCE per box, before any app's observability deploy runs.**
+`~/ops/infra/observability/` holds it:
+
+```sh
+./install-alloy-shared.sh          # /etc/alloy/observability.alloy — the ONE shared loki.write
+sudo k3s kubectl apply -f k8s/     # ns `observability`: Loki 3.4.2 :3100 + Grafana 11.6.0 :3300
+./install.sh                       # obs collector Alloy file, /run/obs tmpfiles, unit templates
+obs install <slug>                 # per product: env files, then obs-collect@<slug>.timer
+```
+
+The namespace is **`observability`**, never a product's name — one project must not own the
+estate's log store. Kubernetes cannot rename a namespace, so getting it wrong costs a
+scale-to-zero redeploy plus a PVC copy.
+
+**App half — in the app's own repo**, `deploy/observability/`: a relabel-only `<app>-logs.alloy`
+that forwards to `loki.write.observability.receiver` **by component name**, `manifest.yaml`, the
+generated `grafana/` tree and `push.sh`. A k8s workload also needs `SyslogIdentifier`'s equivalent —
+the relabel rules that set `service_name` — or its lines land unlabelled.
+
+Every workload gets a `/health` (liveness AND readiness probes pointing at it), a `manifest.yaml`
+entry, and one Grafana alert. A CronJob is a timer: it needs a staleness rule, because "ran fine,
+did nothing" is the failure a liveness probe cannot see.
+
+⚠️ `alloy.service` is a **shared, box-wide system service**. `install-alloy-app.sh` validates the
+whole `/etc/alloy` directory before restarting it; never bypass that — a malformed file takes every
+tenant's log pipeline down at once.
 
 ## Additional Resources
 
