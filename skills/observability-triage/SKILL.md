@@ -56,14 +56,19 @@ absent_over_time({job="kommonz",service="api"}[15m])
 
 ## MCP servers
 
-⚠️ **Tool names below are the official servers' documented names; VERIFY against the live tool list
-before relying on an exact string.** Configure per `mcp-project-config`.
+⚠️ **The shipped config is the source of truth: `<workspace>/.mcp.json` (all four servers, stdio, each
+sourcing its own 0600 `~/.config` env file). Copy from there, don't retype from here.**
 
-| Server | Endpoint / command | Config |
+| Server | Command | Tools |
 |---|---|---|
-| **Sentry** (official, hosted) | `https://mcp.sentry.dev/mcp` | OAuth. Pin the org (`laserfocused`) and, where a lane needs one, the project. Issues, events, releases, Seer root-cause. Read-mostly; issue resolution is inside the boundary, deploys are not. |
-| **PostHog** | `https://mcp.posthog.com/mcp?mode=cli` | **`cli` mode** — one `exec` tool, context-cheap. Read-only session restriction, tool filtering, pinned to one org/project. |
-| **Grafana** | `uvx mcp-grafana`, `GRAFANA_URL=http://127.0.0.1:3301` | `--disable-write --enabled-tools loki,dashboard,alerting,datasources --max-loki-log-limit 50 --loki-guardrail-mode enforce`. Read-only service account scoped to the Loki datasource. |
+| **Sentry** | `npx -y @sentry/mcp-server` — **stdio, not `https://mcp.sentry.dev/mcp`** (that endpoint is OAuth-only: our `sntryu_` token gets 401 `invalid_token`). `--host=de.sentry.io` (the org is EU; `us.sentry.io` 404s), `--organization-slug=laserfocused` (drops `find_organizations`, 9→8 tools), `--disable-skills=project-management`. Token `SENTRY_ACCESS_TOKEN`. | `find_projects`, `search_issues`, `search_events`, `analyze_issue_with_seer`, `update_issue`, `get_sentry_resource`, `search_sentry_tools`, `execute_sentry_tool` |
+| **PostHog** | `npx -y mcp-remote 'https://mcp.posthog.com/mcp?mode=cli'` with a bearer `POSTHOG_PERSONAL_API_KEY` | exactly one: `exec`, a dispatcher (`execute-sql` = HogQL, `error-tracking-issues`, `insight`, `dashboard`, session/replay lookup by `posthog_session_id`, `docs-search`, …) |
+| **Grafana** | `~/.local/bin/mcp-grafana -t stdio` — **a Go binary, there is no `uvx mcp-grafana`**. `--disable-write --enabled-tools loki,dashboard,alerting,datasource --max-loki-log-limit 50 --loki-guardrail-mode enforce`. Two entries: `grafana-platform` (:3300) and `grafana-kommonz` (:3301). | `query_loki_logs`, `query_loki_stats`, `query_loki_patterns`, `analyze_loki_labels`, `list_loki_label_{names,values}`, `get_dashboard_{summary,by_uid,panel_queries,property}`, `alerting_manage_{rules,silences,routing}`, `list_datasources`, `get_datasource`, `check_datasources_health` |
+
+`--enabled-tools` categories are **singular**: `datasource`, not `datasources`. mcp-grafana accepts an
+unknown category silently and just registers 13 tools instead of 16 — you lose every datasource tool
+with no warning. Read-only is enforced twice: the flag hides the write tools, and the token is a
+Viewer service account (`mcp-readonly`) that 403s on a write at the API.
 
 Without an MCP, everything is reachable with `curl` — the Loki HTTP API on `127.0.0.1:3100`, the
 Sentry API on `https://de.sentry.io/api/0/` with `~/.config/sentry.env`, PostHog on

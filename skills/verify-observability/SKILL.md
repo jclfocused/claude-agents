@@ -84,7 +84,9 @@ curl -s "https://de.sentry.io/api/0/projects/$SENTRY_ORG/kommonz-api/events/" \
 
 # 3c. the health bodies (shape, not just 200)
 curl -s http://127.0.0.1:54630/health      | jq '{ok, app, service, env, version, commit, built_at, uptime_s, third_party_mode}'
-curl -s http://127.0.0.1:54630/health/deep | jq '{ok, checks: (.checks | map_values({ok, latency_ms}))}'
+# /health/deep is gated when OBS_HEALTH_TOKEN is set (it IS, in prod) — no header ⇒ {"error":"unauthorized"}
+T=$(grep -m1 '^OBS_HEALTH_TOKEN=' ~/.config/commons/api.env | cut -d= -f2- | tr -d '"')
+curl -s -H "x-obs-token: $T" http://127.0.0.1:54630/health/deep | jq '{ok, checks: (.checks | map_values({ok, latency_ms}))}'
 curl -s http://127.0.0.1:54640/api/health  | jq '{ok, service, commit}'
 ```
 
@@ -92,7 +94,8 @@ Assertions:
 - 3a returns the canary line. Nothing back ⇒ the Alloy relabel matched nothing (check
   `__journal_syslog_identifier`, one underscore) or `alloy.service` is down.
 - 3b returns an `eventID` whose tags carry `request_id` and the **same release string the logs use**.
-- 3c: `/health` has no `checks` key; `/health/deep` `ok` is the AND of every check with
+- 3c: an unauthorized `/health/deep` is the caller missing `x-obs-token`, NOT a broken endpoint
+  (`api/src/health.ts`; the ops collector sends it on loopback). `/health` has no `checks` key; `/health/deep` `ok` is the AND of every check with
   `required !== false`, returns **503** when a required check fails and **200** when only an optional
   one does; `detail` is a human string, never a stack trace, credential or raw path;
   `version`/`commit`/`built_at` are build-time constants, not runtime reads.

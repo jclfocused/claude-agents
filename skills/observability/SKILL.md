@@ -35,6 +35,8 @@ A feature with no way to tell whether it works in prod is not finished. For ever
    from `manifest.yaml` (`ops-dashboard`).
 5. **A service gets `/health` + `/health/deep` and a `manifest.yaml` entry.** Shape in
    `docs/OPS-DASHBOARD-PLAN.md` §5.2; `api/src/health.ts` is the reference implementation.
+   `/health/deep` is gated by `x-obs-token: $OBS_HEALTH_TOKEN` whenever that env is set — call it
+   with the header or you get a 401 that looks like an outage.
 6. **Portability holds** (below).
 7. **Proof, pasted**: one real log line, one real Sentry event id, one real PostHog event id (or an
    explicit "gate shut, nothing sends" note). `verify-observability` produces these.
