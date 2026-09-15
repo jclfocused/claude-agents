@@ -1,116 +1,108 @@
-# Scheduled jobs owned by this repo
+# Scheduled jobs — claude-agents (`~/.claude`)
 
-Status: inventory + migration plan. Nothing here has been migrated yet; no unit was changed to write it.
+Inventory phase, 2026-09-15. Nothing here has been migrated; no unit was stopped, edited or
+disabled. This document records what this repo schedules today, where it actually lives, and what
+the migration target is.
 
 ## The rule
 
-Recurring work that belongs to this repo is **code in this repo, scheduled by this repo, and installed
-by the same action that ships the code**. A hand-written `.service`/`.timer` pair that only ever
-existed in `~/.config/systemd/user/` is the anti-pattern: the repo does not know it exists, nothing
-tests it, nothing re-creates it, and its schedule can drift from the script it runs without a single
-diff being visible. On **2026-09-15** twenty-five such hand-made unit files on this box were found
-truncated to 0 bytes; every backup, drain and watchdog they scheduled had stopped silently and only
-came back because other units happened to be symlinks into a git checkout. The units in the table
-below are in exactly that unprotected category — real files, hand-written, no repo copy. The fix is
-not "back up the unit files", it is that the repo owns the unit definition and an installer re-renders
-it, so a lost or corrupted unit is restored by re-running a deploy rather than by archaeology.
-
-For this repo, "deploy" is `git pull` in place: the working tree **is** `~/.claude`. That does not
-weaken the rule, it just names the mechanism — an idempotent installer committed alongside the script,
-run after a pull, is this repo's equivalent of a framework's scheduler registration.
-
-### Two problems, not one
-
-1. The units are hand-made and untracked (the table's "Unit lives" column).
-2. **`automation/` is not tracked either.** `.gitignore` ignores `*` and re-admits an allowlist
-   (`docs/`, `skills/`, `commands/`, `agents/`, `custom_plugins/`, …). `automation/` is not on it, so
-   `git check-ignore automation/vendor-outreach-watch.sh` reports it ignored and `git ls-files
-   automation/` returns zero files. **Nothing in `automation/` — no wrapper, no prompt, no
-   installer — is in git today.** A migration that only tracks the units still leaves the scripts
-   they run outside version control, so the allowlist change is part of the same work.
-
-`automation/README.md` is the current lane note. It is untracked, and it lists Mac ping and Hyperglot
-health as "timer" when both are in fact crontab entries. This document supersedes it as the inventory.
+Recurring work belongs in the repo that owns it, as code, scheduled by that repo's own mechanism and
+shipped by its normal deploy — so the repo knows about every job it runs, the schedule is reviewed
+like any other diff, and a rebuild reproduces it. A hand-written `.service`/`.timer` pair that exists
+only in `~/.config/systemd/user` is the anti-pattern: it is invisible to the repo, tested by nobody,
+versioned in practice by nobody, and recoverable from no git history. On **2026-09-15** twenty-five
+hand-made unit files on this box were found truncated to 0 bytes; every backup, drain and watchdog
+they scheduled had silently stopped, and the only reason they came back is that other repos had
+tracked copies. This repo had none. The exception is genuinely external-level
+monitoring/watchdog/backup infrastructure, which must keep running when the thing it watches is
+down — that may stay host-scheduled, but its *files* still live in a repo.
 
 ## What this repo schedules today
 
-Two systemd timers and five crontab entries. All seven run scripts under `~/.claude/automation/`.
+Verified 2026-09-15 by reading `~/.config/systemd/user/*.{service,timer}`, `systemctl --user
+list-timers` and `crontab -l`.
 
-| Job | Schedule | What it does | Unit lives | What depends on it not stopping |
+| Job | Schedule | What it does | Where it lives now | What depends on it not stopping |
 |---|---|---|---|---|
-| `vendor-outreach-watch` | `OnCalendar=Mon..Fri *-*-* 08..19:00,30 Europe/Tallinn` + `Mon..Fri *-*-* 20:00`, `Persistent=false` | Runs `automation/vendor-outreach-watch.sh`: a headless `claude -p` lane (pinned `claude-opus-5`, `--strict-mcp-config`, `cd ~/code/coworking-mng-not-shit`) that polls the tracked integration-vendor mail threads and replies inside `automation/vendor-outreach/PROMPT.md`'s policy. | `~/.config/systemd/user/vendor-outreach-watch.{service,timer}` — hand-made real files, in no repo | The one lane holding a **scoped exception to the outbound-send gate**. If it stops, vendor replies sit unanswered and unescalated; nobody is told, because the thing that would tell you is the staleness cron below. |
-| `vendor-outreach-digest` | `OnCalendar=Mon..Fri *-*-* 18:00 Europe/Tallinn`, `Persistent=false` | Same script, `Environment=DIGEST=1` — the end-of-day summary of the tracked vendor threads. | `~/.config/systemd/user/vendor-outreach-digest.{service,timer}` — hand-made real files, in no repo | Justin's only scheduled readout of a lane that is otherwise autonomous and can send mail. Losing it means the lane keeps acting and stops reporting — the worse of the two failure modes. |
-| `vendor-outreach-stale` | crontab `5 * * * *` (hourly) | `automation/vendor-outreach-stale.sh` — alerts to `logs/alerts.log` if `state/vendor-outreach/last-run` is older than 2h inside the lane's own window (Mon–Fri 10:00–20:00 Tallinn). | crontab only, no unit | **This is the watchdog for the two jobs above.** It is the only thing that notices a stopped timer or a wedged lock dir. |
-| `mac-ping` | crontab `*/15 * * * *` | `automation/mac-ping.sh` — SSH reachability of the Mac build box, logs up→down/down→up transitions only, with quiet hours and an N-tick debounce. | crontab only, no unit | Notice that Apple-only work (builds, TestFlight, simulators) has no machine, before a lane discovers it mid-run. |
-| `hyperglot-health` | crontab `0 7 * * *` | `automation/hyperglot-health.sh` — probes `api.hyperglot.io/health`, `app.hyperglot.io`, `hyperglot.io`; failures to `alerts.log`. | crontab only, no unit | External uptime signal for a deployed product. |
-| `mya-timelog` | crontab `40 * * * *` (hourly) | `automation/mya-timelog.py` — recomputes MyArchitectAI engaged work time from Claude Code transcripts per day per Linear issue and syncs a Google Sheet via rclone. Stateless full recompute. | crontab only, no unit | **Billing input.** Silent failure yields a sheet that looks current and is stale — invoiced hours drift with no error anywhere. |
-| `os-refine-weekly` | crontab `30 5 * * 0` (Sun 05:30) | `automation/os-refine-weekly.sh` — headless `os-refine` pass: persona refresh, observation-log drain, OS audit. Pinned `claude-opus-5`. | crontab only, no unit | The OS's own maintenance loop; skills and persona quietly stop being refined. |
+| `vendor-outreach-watch.timer` | Mon–Fri `08..19:00,30` + `20:00` Europe/Tallinn, `Persistent=false` | Runs `automation/vendor-outreach-watch.sh`: a headless `claude -p` lane (model pinned `claude-opus-5`, `--strict-mcp-config`, loads `justin-persona`) that polls the integration-vendor mail threads via `vendor-outreach/gmail.mjs` and handles replies per `vendor-outreach/PROMPT.md`. Carries a **scoped exception to the outbound-send gate**: it may send on the tracked threads only; everything else escalates to Telegram. `DRY_RUN=1` polls and composes without sending. Single-flight via a `mkdir` lock; state and logs are `umask 077`. | **Hand-made real file** in `~/.config/systemd/user/` (not a symlink). The script, prompt and `gmail.mjs` are in `automation/` — **also untracked** (see below). | Highest-consequence orphan in this repo, because the lane can send email as Justin. Two directions: silently stopping means vendor replies go unanswered mid-negotiation with nobody noticing; an untracked unit means a schedule or environment change is reviewed by no one and recoverable from no history. |
+| `vendor-outreach-digest.timer` | Mon–Fri `18:00` Europe/Tallinn | Same script with `DIGEST=1` — the end-of-day digest shot. (The script also derives `DIGEST` from the clock, so the 18:00 watch shot is a digest even if this unit is missing.) | Hand-made real file in `~/.config/systemd/user/`. | The daily summary of thread state. Lower blast radius than the watcher, same ownership gap. |
+| `vendor-outreach-stale.sh` | cron hourly `5 * * * *` | Watchdog: alerts if `state/vendor-outreach/last-run` is >2h old inside the send window (Mon–Fri 10:00–20:00 Tallinn), appending to `automation/logs/alerts.log` and pushing an urgent Telegram message. This is the one line that watches the watcher. | User crontab + untracked script. | It is the only staleness detection for the watcher. If it stops, a stopped watcher becomes invisible again. |
+| `os-refine-weekly.sh` | cron `30 5 * * 0` (Sun 05:30) | Headless `os-refine` pass: persona refresh, observation-log drain, OS audit. Model pinned `claude-opus-5`. | User crontab + untracked script. | Weekly drift correction of the OS/persona. Degrades slowly and silently — nothing alerts on a missed run. |
+| `mac-ping.sh` | cron `*/15 * * * *` | Probes the Mac build machine over SSH, logs up→down / down→up transitions to `alerts.log`, with `DOWN_TICKS` debounce (~2h) because the clamshell naps. | User crontab + untracked script. | Notice that the Apple build box is unreachable before a build needs it. |
+| `hyperglot-health.sh` | cron `0 7 * * *` | Nightly probe of `api.hyperglot.io/health` and `app.hyperglot.io`; failures to `alerts.log`. | User crontab + untracked script. | Overnight detection of a dead hyperglot endpoint. |
+| `mya-timelog.py` | cron `40 * * * *` | Recomputes MyArchitectAI engaged work time from Claude Code transcripts (sessions + subagents) per day per Linear issue and syncs a Google Sheet via rclone. | User crontab + untracked script. | Billable time records for MyArchitectAI. A silent stop means hours are simply not recorded. |
 
-Not owned here: `punch-sweep.timer` and `punch-miners.timer` write into this tree's paths but belong
-to the **punch** plugin repo, which already installs its own units from code (see below). Do not
-adopt them into this repo's installer.
+**Not this repo's:** `punch-sweep.timer` and `punch-miners.timer` execute out of
+`~/.claude/plugins/cache/punch/punch/0.1.0/bin/punch` — an installed plugin artifact. They are owned
+by the `punch` repo and are inventoried there, not here.
 
-### Known quirks worth carrying into the migration, not re-creating
+**The gap is wider than the units.** `git ls-files '*.timer' '*.service'` returns zero, as expected —
+but `.gitignore` in this repo ignores `*` and allowlists only `CLAUDE.md`, `docs/`, `commands/`,
+`agents/`, `skills/`, `agent_descriptions/`, `.claude-plugin/`, `custom_plugins/`, `README.md`.
+`automation/` is therefore **entirely untracked**: the wrapper scripts, `vendor-outreach/PROMPT.md`
+(which is the send policy for a lane that emails on Justin's behalf), `gmail.mjs`, and the lane table
+in `automation/README.md`. `git check-ignore -v automation/vendor-outreach-watch.sh` confirms it,
+matching line 2 (`*`). `automation/README.md` already drifted from reality as a result — it lists
+Mac-ping and hyperglot-health as "timer" when both are cron.
 
-- **18:00 collision.** `vendor-outreach-watch.timer`'s `08..19:00,30` range already includes 18:00, and
-  `vendor-outreach-digest.timer` also fires at 18:00. The wrapper takes a `mkdir` lock, so whichever
-  loses appends a `SKIPPED — lock held` line to `alerts.log` rather than running. The pair works by
-  collision, not by design.
-- **`DIGEST` is derived twice.** `vendor-outreach-watch.sh:27` already sets `DIGEST=1` when the Tallinn
-  hour is 18 and the minute is < 15, so `Environment=DIGEST=1` in the digest unit is belt-and-braces.
-  One of the two should own the decision after migration.
-- The two vendor units are **one script distinguished only by an environment variable**. They move
-  together or not at all.
+## Migration target
 
-## Migration target, per job
+There is **no application framework in this repo and none should be invented.** `claude-agents` is a
+configuration/skill repo consumed by the Claude Code harness; it runs no server, so there is no
+process to host an in-process scheduler. Standing up a Node daemon purely to own a cron expression
+would be strictly worse than what exists. systemd stays the scheduler. What changes is that the
+**repo owns the unit files and the scripts**, and installs them by symlink — exactly the pattern
+`ops` already uses for its 16 tracked timers (`ops/infra/install.sh`: `ln -sfn "$ROOT/infra/<unit>"
+"$UNIT_DIR/<unit>"`, then `daemon-reload` + `enable`), and the pattern every `~/prod/<app>/deploy/`
+unit on this box already follows.
 
-The mechanism below is not a proposal in the abstract — it is the pattern already running on this box,
-verified in the punch plugin: unit **templates committed in the repo** (`infra/punch-sweep.service`,
-`infra/punch-sweep.timer`) carrying `__NODE__`/`__PUNCH__` placeholders, and an installer command
-(`punch install-sweeper`, `bin/punch:1253`) that renders them with real absolute paths, writes them to
-`~/.config/systemd/user/`, then runs `systemctl --user daemon-reload` and `enable --now`. The unit on
-the box becomes a rendered artifact of repo code. That is what this repo should copy.
+Mechanism, once:
 
-| Job | Target | Owning file(s) |
+- `.gitignore` gains `!automation/` + `!automation/**`, minus the runtime dirs
+  (`automation/logs/`, `automation/state/`, `automation/.*.lock`) which must stay ignored — they are
+  `umask 077` and contain thread state.
+- `automation/units/` holds the tracked `.service` / `.timer` files.
+- `automation/install.sh` symlinks them into `~/.config/systemd/user/`, runs `daemon-reload`, and
+  enables each — idempotent, re-runnable, and the single documented way to reinstall the box's
+  agent lanes.
+- Cron entries become timers under the same installer, so one mechanism covers everything and
+  `crontab -l` stops being an undocumented second scheduler. A tracked `automation/crontab` is the
+  weaker fallback if any job turns out to need cron semantics.
+
+Per job:
+
+| Job | Target file in this repo | Notes |
 |---|---|---|
-| `vendor-outreach-watch` + `vendor-outreach-digest` | **Migrate together.** Commit both unit pairs as templates and install them from code. Resolve the 18:00 collision and the double `DIGEST` derivation in the same change — either one timer whose 18:00 shot is the digest (the script already detects it), or two timers with non-overlapping calendars. | `automation/infra/vendor-outreach-watch.{service,timer}`, `automation/infra/vendor-outreach-digest.{service,timer}` (templates), installed by `automation/install.sh` |
-| `mya-timelog` | Move from crontab to a repo-owned timer template + installer entry, same as above. Billing input should fail loudly: it needs a run log line and a staleness check on its last successful sheet sync, neither of which exists today. | `automation/infra/mya-timelog.{service,timer}`, `automation/mya-timelog.py` |
-| `os-refine-weekly` | Same: crontab → repo-owned timer template + installer entry. `Persistent=true` is the right setting for a weekly job (a box asleep at 05:30 Sunday currently just skips the week). | `automation/infra/os-refine-weekly.{service,timer}` |
-| `vendor-outreach-stale` | **Stays a host-level job — but tracked.** It is the watchdog for the vendor lane; it must keep running when the lane is wedged, dead, or mid-migration, so it does not get folded into the thing it watches and must not share its lock, its log, or its unit. Commit its template and install it from the same installer, but keep it a separate, independently-scheduled unit. | `automation/infra/vendor-outreach-stale.{service,timer}` |
-| `mac-ping` | **Stays a host-level job.** External-level monitoring of a machine this box does not run: its entire purpose is to report when the target is down. Track the template, keep it independent. | `automation/infra/mac-ping.{service,timer}` |
-| `hyperglot-health` | **Stays a host-level job** for the same reason — it probes a deployed product from outside, and an in-app scheduler cannot report that the app is unreachable. Long term this belongs with the external monitoring stack rather than here; until then, track the template and keep it independent. | `automation/infra/hyperglot-health.{service,timer}` |
+| `vendor-outreach-watch` | `automation/units/vendor-outreach-watch.{service,timer}` + the already-present `automation/vendor-outreach-watch.sh` and `vendor-outreach/PROMPT.md`, all tracked | Do this one first. The send policy and the schedule of an email-sending lane both belong under review. |
+| `vendor-outreach-digest` | `automation/units/vendor-outreach-digest.{service,timer}` | Same change, same commit. |
+| `vendor-outreach-stale` | `automation/units/vendor-outreach-stale.{service,timer}` | **Stays host-scheduled** — watchdog class. It must fire when the watcher is dead, so it may not share the watcher's process, lock or lifetime. Its file still lives here. |
+| `os-refine-weekly` | `automation/units/os-refine-weekly.{service,timer}` | Genuinely this repo's work — an OS/persona maintenance lane. |
+| `mac-ping` | `automation/units/mac-ping.{service,timer}` | **Stays host-scheduled** — external-level probe of a machine that is by definition sometimes down. Candidate to move to `ops/infra/watchdogs/` where `lfos-mem-watch` and friends already live and where the collector already tails `alerts.log`; Justin's call, not made here. |
+| `hyperglot-health` | `automation/units/hyperglot-health.{service,timer}` | **Stays host-scheduled** — same reasoning; it probes hyperglot from outside. Same open question about `ops/infra/watchdogs/` or the hyperglot repo owning it. |
+| `mya-timelog` | Owning repo is arguably **myarchitectai**, not this one — it produces billable time records for that product. It is box-coupled (it reads Claude Code transcripts from `~/.claude/projects`), so it stays host-scheduled wherever it lands. Open call. | Until that is decided, tracking it here beats the status quo of tracking it nowhere. |
 
-Prerequisite for every row: add `!automation/` + `!automation/**` to the `.gitignore` allowlist (keeping
-`automation/logs/`, `automation/state/` and `automation/.vendor-outreach.lock` excluded — they are
-runtime, owner-only, and the lane writes credentials-adjacent files into `state/`). Without this, the
-installer and the templates would themselves be untracked, which is the bug.
+Alerting already partly exists and should be preserved rather than rebuilt: every wrapper appends a
+failure line to `automation/logs/alerts.log`, and `ops/packages/collector/src/adapters/alerts-tails.ts`
+tails that exact path, so failures surface on the ops dashboard. The vendor-outreach lane is the only
+one with a positive staleness check (`state/vendor-outreach/last-run` + the hourly stale script); the
+others alert on failure but not on silence. No `manifest.yaml` row in `ops` mentions vendor-outreach —
+a unit nothing watches is the failure mode this whole exercise exists to close.
 
-Open question, not for this phase: `vendor-outreach` is described in its own unit as the *Kommonz*
-vendor-outreach watcher and runs with `cwd=~/code/coworking-mng-not-shit`. Per Justin's 2026-09-15
-directive, a Kommonz business job belongs in the Kommonz repo. Its assets (prompt, `gmail.mjs`, state,
-persona) all live here and it is an agent lane rather than application code, so this document assigns
-it here for now. If the lane grows into Kommonz business process, re-home the whole lane rather than
-splitting the schedule from the script.
+## Definition of done (per job)
 
-## Definition of done for a migration
-
-A job has finished migrating when all five hold:
-
-1. **Defined in code.** The unit exists as a template committed in this repo; the copy in
-   `~/.config/systemd/user/` is a rendered artifact, reproducible from the repo alone.
-2. **Installed by the deploy.** One idempotent `automation/install.sh` renders every template, runs
-   `systemctl --user daemon-reload`, and `enable --now`s each timer. Re-running it after a `git pull`
-   is safe and is the documented step. Deleting a unit file and re-running restores it byte-identical.
-3. **Has a log line.** Every run appends a structured start/exit line to `automation/logs/<lane>.log`
-   and a failure line to `logs/alerts.log`. No lane's success is inferred from the absence of noise.
-4. **Has an alert or a staleness check.** Either an `ExecStopPost` failure line *and* a last-run stamp
-   with a watcher (the `vendor-outreach-stale.sh` shape), or an explicit statement in this file of why
-   the job needs neither. A timer that stops and takes its own alerting with it is the exact
-   2026-09-15 failure.
-5. **The old scheduler is retired in the same change.** The crontab line is removed, or the hand-made
-   unit is replaced by the rendered one, in the same commit that adds the code — never left running in
-   parallel. Two schedulers for one job is how a lane ends up firing twice or not at all.
-
-Migration is done per job, verified by: stop the timer, delete the unit file, re-run the installer,
-confirm `systemctl --user list-timers` shows it back with the same next-elapse, and confirm one real
-log line from a manual `systemctl --user start <unit>`.
+1. The unit and the script it runs are **tracked in this repo**, and `automation/install.sh` installs
+   them by symlink — so `~/.config/systemd/user/<unit>` is a link into the checkout, never a real file.
+2. A fresh install reproduces the job from the repo alone: clone, run the installer, and the timer is
+   scheduled with the same calendar, the same environment and the same lock.
+3. The job emits **one structured log line per run** (start, outcome, duration) to
+   `automation/logs/<lane>.log` and a failure line to `alerts.log`.
+4. It has a **staleness check, not only a failure check** — a `last-run` stamp plus something that
+   alerts when the stamp goes cold inside the job's own window, the way `vendor-outreach-stale.sh`
+   already does. A job that stops being scheduled produces no failure line at all; that is exactly
+   how 2026-09-15 stayed silent.
+5. The hand-made host file is **retired in the same change** that lands the tracked one — removed
+   from `~/.config/systemd/user/` and replaced by the symlink, with `daemon-reload` run and
+   `systemctl --user list-timers` showing the job still on its schedule. Two copies of a unit is
+   worse than one untracked copy.
+6. For anything marked **stays host-scheduled**: say so in this table with the reason, and confirm it
+   does not depend on the app it watches being up.
