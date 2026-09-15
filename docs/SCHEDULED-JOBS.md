@@ -45,6 +45,18 @@ in `automation/README.md`. `git check-ignore -v automation/vendor-outreach-watch
 matching line 2 (`*`). `automation/README.md` already drifted from reality as a result — it lists
 Mac-ping and hyperglot-health as "timer" when both are cron.
 
+### Quirks to carry into the migration, not re-create
+
+- **18:00 collision.** `vendor-outreach-watch.timer`'s `08..19:00,30` range already covers 18:00 and
+  18:30, and `vendor-outreach-digest.timer` also fires at 18:00. The wrapper takes a `mkdir` lock, so
+  whichever loses appends a `SKIPPED — lock held` line to `alerts.log` instead of running. The pair
+  works by collision, not by design.
+- **`DIGEST` is decided twice.** `vendor-outreach-watch.sh:27` already sets `DIGEST=1` when the
+  Tallinn hour is 18 and the minute is < 15, so `Environment=DIGEST=1` in the digest unit is
+  belt-and-braces. One of the two should own the decision after the migration.
+- The two vendor units are **one script distinguished only by an environment variable**. They move
+  together or not at all.
+
 ## Migration target
 
 There is **no application framework in this repo and none should be invented.** `claude-agents` is a
