@@ -85,6 +85,8 @@ PASS: `urgent` Noul + `topic` Choice (with `other: null`) in one request; `urgen
 
 `~/.claude/hooks/jev-review.sh` (PreToolUse, both harnesses) reviews staged diffs + the message on `git commit`, and durable-prose `Write`/`Edit` (memory, research, docs/{backlog,design,products}, SKILL.md, AGENTS.md, CLAUDE.md).
 A `memory/*.md` write also answers to the memory-write rules (derivable from the repo, relative dates, frontmatter `type:` vs how it reads); on `Stop` the last assistant reply is checked against the reply template (preamble, leads-with-answer, closing question list, unrequested caveats).
+Every code file is also checked for a hardcoded external-world fact (model id, API version, vendor endpoint, price) that the stale-facts rule says to verify; `gh pr create|edit` reviews the branch diff against the PR title+body; `mem learn` compares the new brief against the five nearest bay briefs and flags a duplicate.
+On `UserPromptSubmit` the prompt is routed against every installed skill's description and, on a clear match (p >= 0.85), one `additionalContext` line names the skill — a hint, never a block; silence it with `JEV_SKILL_HINT=off`.
 Advisory only — never a red/green CI boundary: findings print once to stderr and the identical command/reply repeated proceeds unchanged; any error, timeout or missing key fails open.
 On demand: `node ~/ops/infra/jev-review/review.mjs --staged | --diff main | --files <p...> | --prose <file>` (`--json`, `--verbose`, `--strict`).
 Questions and thresholds are policy in `~/ops/infra/jev-review/questions.mjs`; `selftest.mjs` asserts their invariants plus one live call.
