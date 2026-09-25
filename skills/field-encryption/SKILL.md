@@ -120,10 +120,17 @@ These are LF-DATA-027. Each one closes a failure we have already had.
 - A broker release that changes the client needs a `commons-api` (or consuming API) restart.
 
 **Key-store recovery is escrowed and drilled.**
-- Keep the OpenBao unseal material in at least two independent places (today: 1Password, the Mac
-  and the server). Keep it separate from erasable subject keys, which are never escrowed.
-- Run a monthly isolated restore drill: restore a snapshot on an isolated host, decrypt a synthetic
-  subject, confirm an erased subject stays unreadable. Alert when the drill is overdue.
+- Keep the OpenBao unseal material in at least two independent places (today: the server's
+  `bootstrap.json`, the Mac, 1Password and Google Secret Manager `kommonz-openbao-unseal-share` in
+  `cowork-app-lf`). Compare copies by SHA-256, never by printing them. Keep it separate from
+  erasable subject keys, which are never escrowed. The Cloud KMS key
+  `kommonz-openbao/openbao-auto-unseal` exists for a later move to auto-unseal; OpenBao does not use
+  it today.
+- Run the monthly isolated restore drill by hand: `run.sh restore-isolated` from the deployed
+  backup-service release restores the latest snapshot into a fresh loopback OpenBao and verifies the
+  wrapping key (`master_verified: true`). Record the result. No timer runs it.
+- Known gaps, not built: the drill does not yet decrypt a synthetic subject or confirm an erased
+  subject stays unreadable, and nothing alerts when the drill is overdue.
 
 ## 4. Before you open the PR in an encrypted app
 
