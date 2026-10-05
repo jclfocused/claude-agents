@@ -1,0 +1,7 @@
+{
+  "name": "lf-probe",
+  "version": "0.0.1",
+  "description": "Throwaway probe: proves mod hooks load and what $ nouns reach on this box.",
+  "author": { "name": "LaserFocused ops probe" },
+  "types": "./types/index.d.ts"
+}
