@@ -44,6 +44,7 @@ PASS: install from the release tree, and develop with `--plugin-dir` pointed at 
 
 ## Hard don'ts
 
+0. **Codex has no mods.** A mod is a Claude-only layer of UI and ergonomics. Anything a Codex session also needs stays a hook in both harnesses: enforcement, context the model reads, and ledger or telemetry emits. Before a mod replaces a Claude settings hook, check `~/.codex/hooks.json` and `infra/codex-parity/sync.sh`, and keep the Codex equivalent. Every mod shipped or changed gets an entry in the system changelog (`~/ops/docs/system-changelog/`).
 1. **No enforcement only in a mod.** Guards (bash-guard, context-guard-*, no-anthropic-api, secret scans) stay settings shell hooks, which are also shared with Codex. A mod may add UI or a stricter retry on top. With every mod unloaded, the box must behave as it does today.
 2. **Never loosen.** No `tool.check` hook, no `allow` from `classic.PreToolUse`/`classic.PermissionRequest`, no answering `tool.call` without `next`, no `updatedInput`/`updatedToolOutput`, and never rely on a deny after `await next`.
 3. **No model or agent calls from mod code:** no `$.model.complete/fork`, `$.agent.spawn`, `$.prompt.submit` or `$.mcp.call`. Code-made model calls route through Codex per CLAUDE.md, and `$.model` bills the session's Claude credential.
