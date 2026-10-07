@@ -22,8 +22,18 @@
 !custom_plugins/
 !custom_plugins/**
 
+# Hook scripts and the status line (re-included 2026-10-07; secret-scan before every push)
+!/hooks/
+!/hooks/**
+!/statusline.sh
+# Held back: their detector pattern literals match the pre-push secret scan
+# (and commit-secret-scan blocks staging them). Publish only on Justin's decision.
+/hooks/commit-secret-scan.sh
+/hooks/prompt-secret-warn.sh
+
 # Agent descriptions
 !*.md
 
 # But ignore backups
 commands/backups/
+backups/
