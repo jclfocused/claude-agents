@@ -90,6 +90,30 @@ class CreditPolicy(unittest.TestCase):
                     self.assertEqual(result.returncode, 2)
                     self.assertIn("Anthropic API", result.stderr)
 
+    def test_product_key_and_sdk_installs_are_allowed(self):
+        for cmd in [
+            'curl -s https://api.anthropic.com/v1/models -H "x-api-key: $COMMONS_CLAUDE_API_KEY"',
+            "set -a; . ~/.config/commons/claude-dev.env; set +a; ANTHROPIC_API_KEY=$COMMONS_CLAUDE_API_KEY node probe.mjs",
+            "npm install @anthropic-ai/sdk@0.70.0",
+            "cd api && env -u NODE_ENV npm install @anthropic-ai/sdk",
+            "npm ls @anthropic-ai/sdk",
+        ]:
+            with self.subTest(cmd=cmd):
+                self.assertEqual(self.call(cmd).returncode, 0)
+
+    def test_box_key_and_non_install_sdk_use_stay_blocked(self):
+        for cmd in [
+            'curl https://api.anthropic.com/v1/messages -H "x-api-key: $ANTHROPIC_API_KEY"  # COMMONS_CLAUDE_API_KEY',
+            "COMMONS_CLAUDE_API_KEY=x node -e 'process.env.ANTHROPIC_API_KEY'",
+            "npm install @anthropic-ai/sdk && curl https://api.anthropic.com/v1/messages",
+            "npx @anthropic-ai/claude-code",
+            "npm ls; node -e 'new Anthropic()'",
+        ]:
+            with self.subTest(cmd=cmd):
+                result = self.call(cmd)
+                self.assertEqual(result.returncode, 2)
+                self.assertIn("Anthropic API", result.stderr)
+
     def test_read_only_key_name_lookup_is_allowed(self):
         self.assertEqual(self.call("rg -l ANTHROPIC_API_KEY ~/.config", low=True).returncode, 0)
 

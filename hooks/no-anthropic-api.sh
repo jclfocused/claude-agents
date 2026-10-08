@@ -32,6 +32,21 @@ esac
 
 # Subscription CLI model names alone are not evidence of paid API usage.
 deny_re='api\.anthropic\.com|ANTHROPIC_API_KEY|@anthropic-ai/|anthropic\.messages|Anthropic\('
+# Product exception (Justin, 2026-10-08: the rule is "no Anthropic API for you, not for our products that
+# have valid API use cases"). A product calls Claude with its own workspace-scoped key, and an agent building
+# that product may validate the key and test the API features it builds with small, cheap calls. A command
+# passes when it names a registered product key and never reads the box-wide ANTHROPIC_API_KEY. A
+# package-manager command whose only hit is the SDK package name passes too (a dependency, not spend).
+# Register a product by appending its key variable and key file to product_key_re.
+product_key_re='COMMONS_CLAUDE_API_KEY|\.config/commons/claude(-dev)?\.env'
+box_key_read_re='\$\{?ANTHROPIC_API_KEY\b|env\.ANTHROPIC_API_KEY|environ[^A-Za-z]*ANTHROPIC_API_KEY|getenv\([^)]*ANTHROPIC_API_KEY'
+pkg_re='(^|[;&|][[:space:]]*)(env[[:space:]]+[^;&|]*)?(npm|pnpm|yarn|bun)[[:space:]]+(i|install|add|ci|ls|list|view|info|why|update|up|remove|rm|uninstall|outdated)([[:space:]]|$)'
+product_ok=false
+if printf '%s' "$cmd" | grep -Eq "$product_key_re" && ! printf '%s' "$cmd" | grep -Eq "$box_key_read_re"; then
+  product_ok=true
+elif printf '%s' "$cmd" | grep -Eq "$pkg_re" && ! printf '%s' "${cmd//@anthropic-ai\//}" | grep -Eq "$deny_re"; then
+  product_ok=true
+fi
 # Pure read-only name lookups pass; later commands do not inherit that exemption.
 read_only=false
 if printf '%s' "$cmd" | grep -Eq '^[[:space:]]*(grep|rg|ugrep|ls|find|stat|wc)[[:space:]]' &&
@@ -39,8 +54,8 @@ if printf '%s' "$cmd" | grep -Eq '^[[:space:]]*(grep|rg|ugrep|ls|find|stat|wc)[[
    [ "$(printf '%s' "$cmd" | wc -l)" -eq 0 ]; then
   read_only=true
 fi
-if [ "$read_only" = false ] && printf '%s' "$cmd" | grep -Eq "$deny_re"; then
-  echo "BLOCKED: the Anthropic API is not to be used by jobs on this box (Justin, 2026-09-20 — no credits; access was cut off mid-bench). Use Codex gpt-6.1-sol at xhigh or better (codex exec … -c model_reasoning_effort=xhigh) or the OpenAI models the services run (gpt-5.6-luna). Read-only checks of the env var NAME with grep/rg are fine." >&2
+if [ "$read_only" = false ] && [ "$product_ok" = false ] && printf '%s' "$cmd" | grep -Eq "$deny_re"; then
+  echo "BLOCKED: the Anthropic API is not to be used by jobs on this box (Justin, 2026-09-20 — no credits; access was cut off mid-bench). Use Codex gpt-6.1-sol at xhigh or better (codex exec … -c model_reasoning_effort=xhigh) or the OpenAI models the services run (gpt-5.6-luna). Read-only checks of the env var NAME with grep/rg are fine. Product exception (2026-10-08): a product feature's own registered key (e.g. \$COMMONS_CLAUDE_API_KEY) may be used to validate it and test the API features being built, with small calls and never the box-wide key; SDK installs via npm/pnpm/yarn/bun pass." >&2
   exit 2
 fi
 # Conserve the Claude subscription when the collector's existing flag is present.
