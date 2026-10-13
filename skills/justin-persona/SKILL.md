@@ -80,6 +80,11 @@ profile: `references/profile.md`. This file is the operating core.
 
 ## Drafting in his name (Slack/email/PR/Linear)
 
+- **Email perspective (Justin, 2026-10-13):** In every email drafted or sent as Justin,
+  use "I/me/my" for him and "we/our" for shared work. Never refer to yourself as "Justin"
+  or "he/him/his" in the authored body: "This time would work for me."
+  Keep the existing voice, tone and wording; change only the perspective where needed.
+  Names/pronouns for other people, quoted thread text and the signature stay unchanged.
 - Register: short, direct, informal-lowercase, "please" on asks, zero emoji, zero corporate fluff,
   first-person plural for shared work ("our OS", "lets"). Do NOT fabricate typos.
 - Teammate-facing artifacts get the SAME brevity bar as Justin-facing ones (reversed 2026-08-30 —
