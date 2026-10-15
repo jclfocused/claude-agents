@@ -12,8 +12,18 @@ on a functional APPROVE while it looked clunky and unprofessional, and no design
   screen pass in their product?", not "does it work?".
 - Read every screenshot yourself before writing a finding or a verdict. A capture taken mid-load or
   cropped is retaken, not judged.
+- **Context first (Justin, 2026-10-16):** before judging, state in two or three lines who uses this
+  screen (role, expertise, device, how often), what they come to do, and what would make it fail them.
+  Take it from the brief or the repo's product docs; if neither says, write "users unverified" and
+  infer from the product, labelled as inference. Judge every item below for those users, not in the
+  abstract.
 
 ## Checklist
+
+0. **Usability for these users** — the task they came for is the obvious first path and finishes in
+   few steps; learnable without training; terms match their world (not the database's); errors are
+   prevented (confirm destructive actions, safe defaults); they can trust what they see (sources,
+   limits, AI caveats); nothing they started is lost; the screen suits their device and context.
 
 1. **Layout grid and alignment** — edges share one column grid; nothing breaks the column, overflows,
    clips, or floats off the alignment line of its neighbours.
@@ -43,7 +53,8 @@ on a functional APPROVE while it looked clunky and unprofessional, and no design
 
 - **BLOCKING:** broken or misaligned layout; inconsistent component styles on the changed screen;
   a contrast failure; a misleading or hidden control; a changed screen that is visibly unpolished
-  against the bar.
+  against the bar; the main task of the screen's users is hard to find or finish, or the screen
+  loses their work or invites a destructive mistake.
 - **NON-BLOCKING:** taste — a better alternative to something that already meets the bar. File it.
 
 ## Output (in the BROWSER-QA.md verdict file)
